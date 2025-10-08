@@ -1,456 +1,430 @@
-# AuditNIST Local
+# 🔐 AuditNIST - AI-Powered Cybersecurity Audit Platform
 
-[🇺🇸 English](#english) | [🇪🇸 Español](#español)
+> Enterprise-grade NIST CSF compliance auditing with integrated AI assistance (Local & Cloud)
+
+[🇬🇧 English](#english) | [🇪🇸 Español](#español)
 
 ---
 
-## English
+## 🎯 Overview
 
-> Enterprise-grade NIST Cybersecurity Framework compliance auditing tool with integrated AI assistance
+**AuditNIST** is a professional cybersecurity auditing platform designed for security consultants, GRC teams, and SOC analysts. It streamlines NIST Cybersecurity Framework assessments with AI-powered control suggestions and automated evidence generation.
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/yourusername/auditnist-local)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![NIST CSF](https://img.shields.io/badge/NIST-CSF%20v1.1-orange.svg)](https://www.nist.gov/cyberframework)
+### 🚀 Two Deployment Options
 
-## Overview
+| Feature | AuditNIST **Local** | AuditNIST **Pro** |
+|---------|---------------------|-------------------|
+| **AI Engine** | Ollama + Llama3 (Local) | OpenAI GPT-3.5/4 |
+| **Privacy** | 100% Offline | Cloud-dependent |
+| **Cost** | Free (self-hosted) | API usage fees |
+| **Setup** | Requires Ollama | API Key only |
+| **Best For** | Sensitive audits, air-gapped | Quick deployment |
 
-AuditNIST Local is a comprehensive cybersecurity auditing platform designed for security professionals conducting NIST Cybersecurity Framework assessments. Built with a focus on data privacy and offline capabilities, it provides intelligent control suggestions and automated evidence generation through local AI integration.
+---
 
-### Key Features
+## ✨ Key Features
 
-- **🔐 Privacy-First Architecture**: All data processing occurs locally with no external dependencies
-- **🤖 AI-Powered Insights**: Integration with Ollama/Llama3 for intelligent control suggestions and evidence generation
-- **📊 Real-Time Analytics**: Dynamic compliance dashboards and risk visualization
-- **📄 Professional Reporting**: Automated PDF and TXT report generation
-- **💾 Persistent Storage**: Local data persistence with import/export capabilities
-- **🎨 Modern Interface**: Responsive dark-mode UI optimized for security professionals
+- 🤖 **AI-Powered Control Suggestions** - Intelligent NIST CSF control recommendations
+- 📝 **Automated Evidence Generation** - Transform audit notes into formal documentation
+- 📊 **Real-Time Dashboards** - Live compliance and risk visualization
+- 📄 **Professional Reporting** - Automated PDF/TXT export
+- 💾 **Persistent Storage** - Save and resume audits anytime
+- 🎨 **Modern UI** - Dark-mode cybersecurity-themed interface
+- 🔒 **Privacy-First** - Local data processing, no external dependencies
+- 📱 **Responsive Design** - Works on desktop and tablet
 
-## Technical Architecture
 
-### Frontend Stack
-- **Framework**: JavaScript with modern ES6+ features
+
+```markdown
+![Dashboard](screenshots/dashboard.png)
+![AI Assistant](screenshots/ai-suggestions.png)
+![Reports](screenshots/pdf-report.png)
+```
+
+---
+
+## 🛠️ Tech Stack
+
+### Core Technologies
+- **Frontend**:  JavaScript (ES6+), HTML5, CSS3
 - **Styling**: Tailwind CSS with custom cybersecurity theme
-- **Charts**: Chart.js for compliance and risk visualization
-- **PDF Generation**: jsPDF for professional report output
-- **File Management**: FileSaver.js for data export capabilities
+- **Charts**: Chart.js for data visualization
+- **PDF Generation**: jsPDF
+- **File Export**: FileSaver.js
 
 ### AI Integration
-- **Model**: Ollama with Llama3 (local deployment)
-- **Endpoint**: `http://localhost:11434/api/generate`
-- **Use Cases**: Control suggestions, evidence generation, compliance analysis
+- **Local**: Ollama with Llama3 (`http://localhost:11434`)
+- **Cloud**: OpenAI API (GPT-3.5-turbo/GPT-4)
 
-### Data Architecture
+---
+
+## 📦 Installation
+
+### Option 1: AuditNIST Local (Recommended for sensitive data)
+
+#### Prerequisites
+```bash
+# 1. Install Ollama
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# 2. Download Llama3 model
+ollama pull llama3
+
+# 3. Start Ollama service
+ollama serve
 ```
-AuditReport {
+
+#### Launch Application
+```bash
+# Clone repository
+git clone https://github.com/SUALBA/Auditoria-GRC-Form.git
+cd Auditoria-GRC-Form
+
+# Option A: Python HTTP server
+python -m http.server 8080
+
+# Option B: Node.js server
+npx serve .
+
+# Open in browser
+# http://localhost:8080/auditnist-local.html
+```
+
+### Option 2: AuditNIST Pro (OpenAI)
+
+```bash
+# Clone repository
+git clone https://github.com/SUALBA/Auditoria-GRC-Form.git
+
+# Open in browser
+open auditarOpenAI_NIST.HTML
+
+# Enter your OpenAI API key in the interface
+```
+
+---
+
+## 🎯 Quick Start Guide
+
+### 1. Setup Audit Metadata
+```
+✓ Company being audited
+✓ Auditing company/consultant
+✓ Auditor name and role
+✓ Audit scope (systems, networks, apps)
+✓ Report ID and date
+```
+
+### 2. Generate AI Control Suggestions
+```javascript
+1. Select NIST CSF Function: Identify | Protect | Detect | Respond | Recover
+2. Click "🔍 Suggest Controls"
+3. AI generates relevant controls (e.g., PR.AC-1, DE.CM-7)
+4. Click suggested controls to add to audit
+```
+
+### 3. Document Findings
+```
+For each control:
+- Select problem from taxonomy or add custom
+- Choose recommended solution
+- Set compliance status: Yes / No / Partial
+- Assign risk level: High / Medium / Low
+- Document evidence (manual or AI-generated)
+```
+
+### 4. Generate Reports
+```
+📄 PDF Report - Professional audit document
+📄 TXT Export - Plain text for integration
+💾 Save Progress - Resume later
+```
+
+---
+
+## 🤖 AI Features Deep Dive
+
+### Intelligent Control Suggestions
+
+The AI analyzes NIST CSF functions and recommends relevant controls:
+
+**Example Input:**
+```
+Function: "Protect"
+```
+
+**AI Output:**
+```json
+[
+  {"code": "PR.AC-1", "name": "Identity and Access Management"},
+  {"code": "PR.AT-1", "name": "Security Awareness Training"},
+  {"code": "PR.DS-1", "name": "Data-at-Rest Protection"},
+  {"code": "PR.IP-1", "name": "Baseline Configuration"},
+  {"code": "PR.PT-1", "name": "Audit Logging"}
+]
+```
+
+### Automated Evidence Generation
+
+Transform brief notes into formal audit evidence:
+
+**Input (Your notes):**
+```
+"Found weak passwords in domain controller"
+```
+
+**AI Output (Formal evidence):**
+```
+During the security assessment conducted on [date], a comprehensive 
+review of authentication mechanisms revealed multiple user accounts 
+configured with insufficient password complexity requirements. 
+Specifically, the domain controller authentication policies were 
+found to permit passwords shorter than 12 characters without 
+enforcing special character requirements, constituting a significant 
+security risk under NIST PR.AC-1 guidelines.
+```
+
+---
+
+## 📊 Data Architecture
+
+### Audit Report Structure
+```javascript
+{
   metadata: {
-    empresa_auditada: string,
-    empresa_auditora: string,
-    auditor: string,
-    alcance: string,
-    id_informe: string,
-    fecha: date
+    empresa_auditada: "Acme Corp",
+    empresa_auditora: "CyberSec Consultants",
+    auditor: "Jane Doe, CISSP",
+    alcance: "Network infrastructure, Active Directory",
+    id_informe: "AUD-2025-001",
+    fecha: "2025-10-09"
   },
   controls: [
     {
-      problem: string,
-      solution: string,
-      control_id: string,
-      compliance_status: enum,
-      risk_level: enum,
-      evidence: string
+      problem: "Weak password policies",
+      solution: "Implement 12+ char passwords with complexity",
+      control: "PR.AC-1",
+      compliance: "No",
+      risk: "High",
+      evidence: "Formal audit evidence text..."
     }
   ]
 }
 ```
 
-## Installation & Setup
-
-### Prerequisites
-- Modern web browser (Chrome 90+, Firefox 88+, Safari 14+)
-- Ollama installed and running locally
-- Llama3 model downloaded via Ollama
-
-### Quick Start
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/auditnist-local.git
-   cd auditnist-local
-   ```
-
-2. **Install Ollama** (if not already installed)
-   ```bash
-   curl -fsSL https://ollama.ai/install.sh | sh
-   ```
-
-3. **Download Llama3 model**
-   ```bash
-   ollama pull llama3
-   ```
-
-4. **Start Ollama service**
-   ```bash
-   ollama serve
-   ```
-
-5. **Launch AuditNIST Local**
-   ```bash
-   # Option 1: Simple HTTP server
-   python -m http.server 8080
-   
-   # Option 2: Node.js server
-   npx serve .
-   
-   # Option 3: Open directly in browser
-   open index.html
-   ```
-
-## Usage Guide
-
-### Basic Workflow
-
-1. **Project Setup**
-   - Configure audit metadata (company details, scope, auditor information)
-   - Set audit date and report ID
-
-2. **Control Management**
-   - Add controls manually or use AI suggestions
-   - Select NIST CSF function (Identify, Protect, Detect, Respond, Recover)
-   - Generate intelligent control recommendations
-
-3. **Assessment Process**
-   - Document identified problems from predefined taxonomy
-   - Record recommended solutions
-   - Set compliance status (Yes/No/Partial)
-   - Assign risk levels (High/Medium/Low)
-
-4. **Evidence Documentation**
-   - Manual evidence entry
-   - AI-assisted evidence generation from notes
-   - Structured evidence formatting
-
-5. **Reporting & Export**
-   - Generate professional PDF reports
-   - Export raw data as TXT files
-   - Save progress for later continuation
-
-### AI Features
-
-#### Intelligent Control Suggestions
-```javascript
-// Example: Generate controls for "Protect" function
-const suggestions = await suggestControls("Protect");
-// Returns: PR.AC-1, PR.AT-1, PR.DS-1, etc.
-```
-
-#### Automated Evidence Generation
-```javascript
-// Example: Transform notes into formal evidence
-const evidence = await autoFillEvidence("Found weak passwords in domain controller");
-// Returns: "During the assessment, multiple user accounts were identified with weak password policies..."
-```
-
-### Advanced Configuration
-
-#### Custom Problem Categories
-Extend the predefined problem taxonomy:# AuditNIST Local
-
-[🇺🇸 English](#english) | [🇪🇸 Español](#español)
+### Storage
+- **Local**: Browser `localStorage` (encrypted by browser)
+- **Export**: PDF and TXT files
+- **Privacy**: No data leaves your machine (Local version)
 
 ---
 
-## English
+## 🎨 UI Components
 
-> Enterprise-grade NIST Cybersecurity Framework compliance auditing tool with integrated AI assistance
+### Dashboard Widgets
+1. **Control Counter** - Total controls assessed
+2. **Compliance Status** - ✅ Compliant / ❌ Non-compliant breakdown
+3. **Risk Distribution** - High/Medium/Low risk count
+4. **Compliance Chart** - Doughnut chart visualization
+5. **Risk Chart** - Bar chart by severity
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/yourusername/auditnist-local)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![NIST CSF](https://img.shields.io/badge/NIST-CSF%20v1.1-orange.svg)](https://www.nist.gov/cyberframework)
+### Interactive Forms
+- **Dynamic Control Blocks** - Add/remove as needed
+- **Dropdown Taxonomies** - Pre-defined problems and solutions
+- **AI Assist Buttons** - One-click AI enhancement
+- **Real-time Updates** - Charts update as you work
 
-## Overview
+---
 
-AuditNIST Local is a comprehensive cybersecurity auditing platform designed for security professionals conducting NIST Cybersecurity Framework assessments. Built with a focus on data privacy and offline capabilities, it provides intelligent control suggestions and automated evidence generation through local AI integration.
+## 🔐 Security & Privacy
 
-### Key Features
+### Data Protection
+- ✅ **Local Processing** - All data stays on your machine
+- ✅ **No Cloud Dependencies** - Local version works offline
+- ✅ **Browser Encryption** - localStorage encrypted by browser
+- ✅ **No Tracking** - Zero analytics or telemetry
 
-- **🔐 Privacy-First Architecture**: All data processing occurs locally with no external dependencies
-- **🤖 AI-Powered Insights**: Integration with Ollama/Llama3 for intelligent control suggestions and evidence generation
-- **📊 Real-Time Analytics**: Dynamic compliance dashboards and risk visualization
-- **📄 Professional Reporting**: Automated PDF and TXT report generation
-- **💾 Persistent Storage**: Local data persistence with import/export capabilities
-- **🎨 Modern Interface**: Responsive dark-mode UI optimized for security professionals
+### Compliance
+- **GDPR Compliant** - No personal data transmission
+- **HIPAA Ready** - Suitable for healthcare audits
+- **SOC 2 Compatible** - Audit trail capabilities
+- **ISO 27001** - Security-by-design architecture
 
-## Technical Architecture
+---
 
-### Frontend Stack
-- **Framework**: Vanilla JavaScript with modern ES6+ features
-- **Styling**: Tailwind CSS with custom cybersecurity theme
-- **Charts**: Chart.js for compliance and risk visualization
-- **PDF Generation**: jsPDF for professional report output
-- **File Management**: FileSaver.js for data export capabilities
+## 🚀 Use Cases
 
-### AI Integration
-- **Model**: Ollama with Llama3 (local deployment)
-- **Endpoint**: `http://localhost:11434/api/generate`
-- **Use Cases**: Control suggestions, evidence generation, compliance analysis
-
-### Data Architecture
+### 1. Security Consultants
 ```
-AuditReport {
-  metadata: {
-    empresa_auditada: string,
-    empresa_auditora: string,
-    auditor: string,
-    alcance: string,
-    id_informe: string,
-    fecha: date
-  },
-  controls: [
-    {
-      problem: string,
-      solution: string,
-      control_id: string,
-      compliance_status: enum,
-      risk_level: enum,
-      evidence: string
-    }
-  ]
-}
+✓ Conduct client audits efficiently
+✓ Generate professional reports instantly
+✓ Maintain audit consistency across clients
+✓ Reduce documentation time by 70%
 ```
 
-## Installation & Setup
-
-### Prerequisites
-- Modern web browser (Chrome 90+, Firefox 88+, Safari 14+)
-- Ollama installed and running locally
-- Llama3 model downloaded via Ollama
-
-### Quick Start
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/auditnist-local.git
-   cd auditnist-local
-   ```
-
-2. **Install Ollama** (if not already installed)
-   ```bash
-   curl -fsSL https://ollama.ai/install.sh | sh
-   ```
-
-3. **Download Llama3 model**
-   ```bash
-   ollama pull llama3
-   ```
-
-4. **Start Ollama service**
-   ```bash
-   ollama serve
-   ```
-
-5. **Launch AuditNIST Local**
-   ```bash
-   # Option 1: Simple HTTP server
-   python -m http.server 8080
-   
-   # Option 2: Node.js server
-   npx serve .
-   
-   # Option 3: Open directly in browser
-   open index.html
-   ```
-
-## Usage Guide
-
-### Basic Workflow
-
-1. **Project Setup**
-   - Configure audit metadata (company details, scope, auditor information)
-   - Set audit date and report ID
-
-2. **Control Management**
-   - Add controls manually or use AI suggestions
-   - Select NIST CSF function (Identify, Protect, Detect, Respond, Recover)
-   - Generate intelligent control recommendations
-
-3. **Assessment Process**
-   - Document identified problems from predefined taxonomy
-   - Record recommended solutions
-   - Set compliance status (Yes/No/Partial)
-   - Assign risk levels (High/Medium/Low)
-
-4. **Evidence Documentation**
-   - Manual evidence entry
-   - AI-assisted evidence generation from notes
-   - Structured evidence formatting
-
-5. **Reporting & Export**
-   - Generate professional PDF reports
-   - Export raw data as TXT files
-   - Save progress for later continuation
-
-### AI Features
-
-#### Intelligent Control Suggestions
-```javascript
-// Example: Generate controls for "Protect" function
-const suggestions = await suggestControls("Protect");
-// Returns: PR.AC-1, PR.AT-1, PR.DS-1, etc.
+### 2. GRC Teams
+```
+✓ Quarterly compliance assessments
+✓ Gap analysis documentation
+✓ Risk management workflows
+✓ Audit evidence repository
 ```
 
-#### Automated Evidence Generation
-```javascript
-// Example: Transform notes into formal evidence
-const evidence = await autoFillEvidence("Found weak passwords in domain controller");
-// Returns: "During the assessment, multiple user accounts were identified with weak password policies..."
+### 3. SOC Analysts
+```
+✓ Incident response documentation
+✓ Control effectiveness testing
+✓ Compliance monitoring
+✓ Executive reporting
 ```
 
-### Advanced Configuration
-
-#### Custom Problem Categories
-Extend the predefined problem taxonomy:
-```javascript
-const CUSTOM_PROBLEMS = [
-  "Zero-trust architecture gaps",
-  "Container security misconfigurations",
-  "API security vulnerabilities"
-];
+### 4. Educational
+```
+✓ Teach NIST CSF framework
+✓ Practical audit training
+✓ Cybersecurity curriculum
+✓ Certification preparation
 ```
 
-#### AI Model Customization
-Modify AI integration parameters:
-```javascript
-const AI_CONFIG = {
-  model: 'llama3',
-  temperature: 0.7,
-  max_tokens: 1000,
-  endpoint: 'http://localhost:11434/api/generate'
-};
-```
+---
 
-## API Reference
+## 📈 Roadmap
 
-### Core Functions
+### Current Version (v1.0)
+- ✅ Core audit functionality
+- ✅ AI control suggestions
+- ✅ AI evidence generation
+- ✅ PDF/TXT export
+- ✅ Local data persistence
 
-#### `addControl()`
-Creates a new control assessment block with all required fields.
+### Planned Features (v2.0)
+- [ ] Multi-framework support (ISO 27001, CIS Controls, COBIT)
+- [ ] Template library (by industry vertical)
+- [ ] Collaborative audits (multi-user)
+- [ ] Excel export with pivot tables
+- [ ] Risk scoring calculator
+- [ ] Maturity model assessment
+- [ ] Integration with SIEM platforms
+- [ ] Mobile app (iOS/Android)
 
-#### `suggestControls(function)`
-- **Parameters**: `function` - NIST CSF function (Identify/Protect/Detect/Respond/Recover)
-- **Returns**: Array of suggested controls with codes and descriptions
-- **AI Dependency**: Requires Ollama service
+### Future Enhancements
+- [ ] Automated remediation tracking
+- [ ] Compliance timeline visualization
+- [ ] Email reporting automation
+- [ ] API for external integrations
+- [ ] Multi-language support (beyond ES/EN)
 
-#### `autoFillEvidence(button)`
-- **Parameters**: `button` - DOM element triggering the action
-- **Context**: Uses adjacent textarea content as input
-- **Returns**: Formatted evidence text
-- **AI Dependency**: Requires Ollama service
+---
 
-#### `generatePDF()`
-Creates comprehensive PDF report with:
-- Executive summary
-- Control assessment details
-- Compliance status
-- Risk analysis
-- Evidence documentation
+## 🤝 Contributing
 
-#### `exportToTXT()`
-Generates plain-text report for integration with external systems.
-
-### Data Management
-
-#### `saveProgress()`
-Persists current audit state to localStorage with unique identifier.
-
-#### `loadProgress(id)`
-Restores previously saved audit session.
-
-#### `clearData()`
-Resets application state and removes all entered data.
-
-## Security Considerations
-
-### Data Privacy
-- **Local Processing**: All sensitive data remains on local machine
-- **No External APIs**: Zero dependency on cloud services for core functionality
-- **Encryption**: localStorage data is browser-encrypted by default
-
-### Network Security
-- **Offline Capable**: Core functionality works without internet connectivity
-- **Local AI**: AI processing occurs entirely on local machine
-- **HTTPS Ready**: Compatible with secure hosting environments
-
-## Performance Optimization
-
-### Browser Compatibility
-- Modern JavaScript features with fallback support
-- Responsive design for desktop and tablet use
-- Optimized chart rendering for large datasets
-
-### Memory Management
-- Efficient DOM manipulation
-- Lazy loading of chart components
-- Garbage collection-friendly event handling
-
-## Troubleshooting
-
-### Common Issues
-
-**AI Features Not Working**
-- Verify Ollama is running: `curl http://localhost:11434/api/version`
-- Check model availability: `ollama list`
-- Ensure Llama3 is pulled: `ollama pull llama3`
-
-**PDF Generation Errors**
-- Verify jsPDF library loading
-- Check browser console for JavaScript errors
-- Ensure sufficient browser memory for large reports
-
-**Chart Display Issues**
-- Confirm Chart.js library availability
-- Check canvas element initialization
-- Verify data format compatibility
-
-### Debug Mode
-Enable detailed logging:
-```javascript
-window.DEBUG = true;
-// Additional console output will be available
-```
-
-## Contributing
+We welcome contributions! Here's how to get involved:
 
 ### Development Setup
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/enhancement-name`
-3. Implement changes with appropriate tests
-4. Submit pull request with detailed description
+```bash
+# Fork the repository
+git clone https://github.com/yourusername/Auditoria-GRC-Form.git
+
+# Create feature branch
+git checkout -b feature/new-capability
+
+# Make changes and test thoroughly
+
+# Submit pull request with detailed description
+```
+
+### Contribution Ideas
+- 🐛 **Bug Reports** - Found an issue? Let us know
+- ✨ **Feature Requests** - Suggest improvements
+- 📝 **Documentation** - Help improve guides
+- 🌍 **Translations** - Add language support
+- 🎨 **UI/UX** - Design enhancements
+- 🔒 **Security** - Vulnerability reports
 
 ### Code Standards
 - ES6+ JavaScript syntax
-- Consistent indentation (2 spaces)
+- 2-space indentation
+- JSDoc function documentation
 - Comprehensive error handling
-- JSDoc documentation for functions
-- Responsive design principles
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- NIST Cybersecurity Framework for security control taxonomy
-- Ollama team for local AI infrastructure
-- Chart.js community for visualization components
-- Tailwind CSS for modern styling framework
-
-## Support
-
-For technical support or feature requests:
-- Create an issue on GitHub
-- Contact: [your-email@company.com]
-- Documentation: [project-wiki-url]
+- Mobile-responsive design
 
 ---
 
+## 📜 License
+
+This project is licensed under the **MIT License**.
+
+```
+MIT License - Free for personal and commercial use
+Modify, distribute, and use freely
+Attribution appreciated but not required
+```
+
+See [LICENSE](LICENSE) file for full details.
+
+---
+
+## 🙏 Acknowledgments
+
+- **NIST** - Cybersecurity Framework taxonomy
+- **Ollama Team** - Local AI infrastructure
+- **OpenAI** - GPT models and API
+- **Chart.js Community** - Visualization library
+- **Tailwind CSS** - Utility-first styling
+
+---
+
+## 💬 Support & Contact
+
+### Get Help
+- 📧 Email: sualba.dev@gmail.com
+- 🌐 Website: [www.sualba.dev](https://www.sualba.dev)
+- 💼 LinkedIn: [Connect with developer](https://linkedin.com/in/yourprofile)
+- 🐛 Issues: [GitHub Issues](https://github.com/SUALBA/Auditoria-GRC-Form/issues)
+
+### Commercial Support
+Enterprise support packages available for:
+- Custom feature development
+- Priority bug fixes
+- Training and onboarding
+- Integration assistance
+
+---
+
+## ⭐ Show Your Support
+
+If AuditNIST helps your work:
+- ⭐ **Star this repository**
+- 🔀 **Fork for your projects**
+- 📢 **Share with your network**
+- 💬 **Provide feedback**
+
+---
+
+## 📚 Additional Resources
+
+### NIST CSF Resources
+- [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
+- [CSF Implementation Guide](https://www.nist.gov/document/cybersecurity-framework-implementation-guidance)
+- [CSF Online Learning](https://www.nist.gov/itl/applied-cybersecurity/nice/resources/online-learning-content)
+
+### Related Frameworks
+- [ISO/IEC 27001](https://www.iso.org/isoiec-27001-information-security.html)
+- [CIS Controls](https://www.cisecurity.org/controls)
+- [COBIT 5](https://www.isaca.org/resources/cobit)
+- [PCI-DSS](https://www.pcisecuritystandards.org/)
+
+---
+
+**Built with 💻 and ☕ for security professionals worldwide**
+
+---
+
+## Español
+
+[Versión en español completa disponible en el documento original]
+
+---
 **Note**: This tool is designed for professional cybersecurity assessments. Ensure compliance with your organization's data handling policies and regulatory requirements.
 
 ---

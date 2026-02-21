@@ -4,47 +4,51 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>🔐 AuditNIST Local</title>
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script> 
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            cyberbg: '#0f172a',
-            cyberpanel: '#1e293b',
-            cyberaccent: '#38bdf8',
-            cyberevil: '#ef4444',
-            cyberwarn: '#facc15',
-            cyberok: '#22c55e'
+            cyberbg: '#0f172a', cyberpanel: '#1e293b', cyberaccent: '#38bdf8',
+            cyberevil: '#ef4444', cyberwarn: '#facc15', cyberok: '#22c55e'
           }
         }
       }
     }
   </script>
-
-  <!-- Dependencias -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body class="bg-cyberbg text-gray-100 font-mono min-h-screen flex flex-col">
 
   <!-- Header -->
-  <header class="container mx-auto p-4 flex justify-between items-center">
+  <header class="container mx-auto p-4 flex justify-between items-center flex-wrap gap-3">
     <h1 class="text-3xl text-cyberaccent">🔐 AuditNIST Local</h1>
-    <button onclick="clearData()" class="px-3 py-1 bg-cyberevil text-black rounded hover:bg-red-600">
-      Limpiar datos
-    </button>
+    <div class="flex gap-3 items-center flex-wrap">
+      <select id="lang-select" onchange="setLanguage(this.value)"
+              class="px-2 py-1 bg-gray-700 text-gray-100 rounded text-sm border border-gray-600">
+        <option value="es">🌐 ES — Español</option>
+        <option value="en">EN — English</option>
+        <option value="fr">FR — Français</option>
+        <option value="de">DE — Deutsch</option>
+        <option value="pt">PT — Português</option>
+        <option value="ar">AR — العربية</option>
+        <option value="zh">ZH — 中文</option>
+      </select>
+      <button onclick="clearData()"
+              class="px-3 py-1 bg-cyberevil text-black rounded hover:bg-red-600"
+              data-i18n="clear_data">Limpiar datos</button>
+    </div>
   </header>
 
-  <!-- Sugerir Controles -->
+  <!-- Suggest Controls -->
   <section class="container mx-auto mt-4 bg-cyberpanel p-4 rounded-lg shadow-lg">
     <div class="grid md:grid-cols-3 gap-4 items-end">
       <div>
-        <label class="block font-bold text-cyberaccent">Función NIST</label>
+        <label class="block font-bold text-cyberaccent" data-i18n="nist_function_label">Función NIST</label>
         <select id="nist-function" class="w-full mt-1 p-2 rounded bg-gray-700 text-gray-100">
           <option>Identify</option>
           <option>Protect</option>
@@ -54,11 +58,9 @@
         </select>
       </div>
       <div>
-        <button id="suggest-controls"
-                onclick="suggestControls()"
-                class="px-4 py-2 bg-cyberok text-black rounded hover:bg-green-400">
-          🔍 Sugerir controles
-        </button>
+        <button id="suggest-controls" onclick="suggestControls()"
+                class="px-4 py-2 bg-cyberok text-black rounded hover:bg-green-400"
+                data-i18n="suggest_btn">🔍 Sugerir controles</button>
       </div>
       <div>
         <span id="suggest-status" class="text-sm text-cyberwarn"></span>
@@ -69,60 +71,53 @@
 
   <!-- Main Form -->
   <main class="container mx-auto flex-1 mt-6 bg-cyberpanel p-6 rounded-lg shadow-lg">
-    <!-- Metadatos -->
     <div class="grid md:grid-cols-2 gap-4">
       <div>
-        <label class="block font-bold text-cyberaccent">Empresa auditada</label>
-        <input id="empresa_auditada" type="text" placeholder="Nombre de la empresa"
-               class="w-full mt-1 p-2 rounded bg-gray-700 text-gray-100"/>
+        <label class="block font-bold text-cyberaccent" data-i18n="audited_company">Empresa auditada</label>
+        <input id="empresa_auditada" type="text" data-i18n-placeholder="audited_company_ph"
+               placeholder="Nombre de la empresa" class="w-full mt-1 p-2 rounded bg-gray-700 text-gray-100"/>
       </div>
       <div>
-        <label class="block font-bold text-cyberaccent">Empresa auditora</label>
-        <input id="empresa_auditora" type="text" placeholder="Tu consultora o SOC"
-               class="w-full mt-1 p-2 rounded bg-gray-700 text-gray-100"/>
+        <label class="block font-bold text-cyberaccent" data-i18n="auditing_company">Empresa auditora</label>
+        <input id="empresa_auditora" type="text" data-i18n-placeholder="auditing_company_ph"
+               placeholder="Tu consultora o SOC" class="w-full mt-1 p-2 rounded bg-gray-700 text-gray-100"/>
       </div>
       <div>
-        <label class="block font-bold text-cyberaccent">Auditor responsable</label>
-        <input id="auditor" type="text" placeholder="Nombre y rol"
-               class="w-full mt-1 p-2 rounded bg-gray-700 text-gray-100"/>
+        <label class="block font-bold text-cyberaccent" data-i18n="auditor_label">Auditor responsable</label>
+        <input id="auditor" type="text" data-i18n-placeholder="auditor_ph"
+               placeholder="Nombre y rol" class="w-full mt-1 p-2 rounded bg-gray-700 text-gray-100"/>
       </div>
       <div>
-        <label class="block font-bold text-cyberaccent">Alcance de la auditoría</label>
-        <input id="alcance" type="text" placeholder="Sistemas, red, aplicaciones, etc."
-               class="w-full mt-1 p-2 rounded bg-gray-700 text-gray-100"/>
+        <label class="block font-bold text-cyberaccent" data-i18n="scope_label">Alcance de la auditoría</label>
+        <input id="alcance" type="text" data-i18n-placeholder="scope_ph"
+               placeholder="Sistemas, red, aplicaciones, etc." class="w-full mt-1 p-2 rounded bg-gray-700 text-gray-100"/>
       </div>
       <div>
-        <label class="block font-bold text-cyberaccent">ID del informe</label>
-        <input id="id_informe" type="text" placeholder="Ej: INF-2025-001"
-               class="w-full mt-1 p-2 rounded bg-gray-700 text-gray-100"/>
+        <label class="block font-bold text-cyberaccent" data-i18n="report_id_label">ID del informe</label>
+        <input id="id_informe" type="text" data-i18n-placeholder="report_id_ph"
+               placeholder="Ej: INF-2025-001" class="w-full mt-1 p-2 rounded bg-gray-700 text-gray-100"/>
       </div>
       <div>
-        <label class="block font-bold text-cyberaccent">Fecha de auditoría</label>
-        <input id="fecha" type="date"
-               class="w-full mt-1 p-2 rounded bg-gray-700 text-gray-100"/>
+        <label class="block font-bold text-cyberaccent" data-i18n="audit_date_label">Fecha de auditoría</label>
+        <input id="fecha" type="date" class="w-full mt-1 p-2 rounded bg-gray-700 text-gray-100"/>
       </div>
     </div>
 
-    <!-- Controles dinámicos -->
     <div id="controls" class="mt-6 space-y-4"></div>
 
-    <!-- Botones principales -->
     <div class="mt-6 flex flex-wrap gap-4">
       <button onclick="addControl()"
-              class="px-4 py-2 bg-cyberaccent text-black rounded hover:bg-blue-300">
-        + Añadir Control
-      </button>
+              class="px-4 py-2 bg-cyberaccent text-black rounded hover:bg-blue-300"
+              data-i18n="add_control_btn">+ Añadir Control</button>
       <button onclick="generatePDF()"
-              class="px-4 py-2 bg-cyberok text-black rounded hover:bg-green-400">
-        📄 Generar Informe PDF
-      </button>
+              class="px-4 py-2 bg-cyberok text-black rounded hover:bg-green-400"
+              data-i18n="generate_pdf_btn">📄 Generar Informe PDF</button>
       <button onclick="exportToTXT()"
-              class="px-4 py-2 bg-cyberaccent text-black rounded hover:bg-indigo-400">
-        📄 Exportar como .txt
-      </button>
+              class="px-4 py-2 bg-cyberaccent text-black rounded hover:bg-indigo-400"
+              data-i18n="export_txt_btn">📄 Exportar como .txt</button>
     </div>
 
-    <!-- Resumen numérico -->
+    <!-- Summary -->
     <div class="mt-8 grid md:grid-cols-2 gap-4">
       <div class="p-4 bg-cyberbg border-2 border-cyberaccent rounded text-center">
         <div id="countTotal" class="text-xl font-bold">Controles: 0</div>
@@ -138,114 +133,496 @@
       </div>
     </div>
 
-    <!-- Gráficos -->
+    <!-- Charts -->
     <div class="mt-8 grid md:grid-cols-2 gap-8">
       <div class="bg-gray-800 p-4 rounded border border-gray-700">
-        <h2 class="text-cyberaccent mb-2 text-center">Cumplimiento</h2>
+        <h2 class="text-cyberaccent mb-2 text-center" data-i18n="chart_compliance">Cumplimiento</h2>
         <canvas id="chartCompliance"></canvas>
       </div>
       <div class="bg-gray-800 p-4 rounded border border-gray-700">
-        <h2 class="text-cyberaccent mb-2 text-center">Niveles de Riesgo</h2>
+        <h2 class="text-cyberaccent mb-2 text-center" data-i18n="chart_risk">Niveles de Riesgo</h2>
         <canvas id="chartRisk"></canvas>
       </div>
     </div>
   </main>
 
-  <!-- Footer -->
   <footer class="container mx-auto p-4 text-center text-gray-500">
     © 2025 AuditNIST Local. All rights reserved.
   </footer>
 
-  <!-- Script principal -->
+  <!-- Extra buttons -->
+  <div class="container mx-auto mt-6">
+    <div class="flex flex-wrap gap-4">
+      <button onclick="saveProgress()"
+              class="px-4 py-2 bg-cyberwarn text-black rounded hover:bg-yellow-500"
+              data-i18n="save_progress_btn">💾 Guardar Progreso</button>
+      <button onclick="listSavedReports()"
+              class="px-4 py-2 bg-cyberaccent text-black rounded hover:bg-blue-400"
+              data-i18n="view_saved_btn">📋 Ver Informes Guardados</button>
+      <button onclick="exportToTXT()"
+              class="px-4 py-2 bg-cyberok text-black rounded hover:bg-green-400"
+              data-i18n="export_txt_btn">📄 Exportar como .txt</button>
+    </div>
+    <div id="saved-reports" class="mt-4 space-y-2"></div>
+  </div>
+
   <script>
     const { jsPDF } = window.jspdf;
 
-    // Datos predefinidos
-    const PROBLEMS = [
-      "Contraseñas débiles o compartidas",
-      "Accesos sin control ni registros",
-      "Ausencia de backups o no probados",
-      "Actualizaciones pendientes",
-      "Logs desactivados o ignorados",
-      "Falta de formación",
-      "Antivirus/firewall sin actualizar",
-      "Uso inadecuado de herramientas ofensivas",
-      "Usuarios inactivos",
-      "Red mal segmentada",
-      "Otro..."
-    ];
-    const SOLUTIONS = [
-      "Aplicar política de contraseñas robustas y únicas",
-      "Implementar control de acceso y registro de auditoría",
-      "Establecer políticas de backup automatizado",
-      "Mantener el software y sistemas actualizados",
-      "Activar y revisar logs periódicamente",
-      "Realizar formaciones de concienciación en ciberseguridad",
-      "Actualizar o sustituir el antivirus/firewall",
-      "Establecer reglas y control sobre el uso de herramientas ofensivas",
-      "Auditar y eliminar usuarios inactivos regularmente",
-      "Segregar la red por VLANs o zonas de confianza",
-      "Otro..."
-    ];
+    // ── TRANSLATIONS ────────────────────────────────────────────────────────
+    const TRANSLATIONS = {
+      es: {
+        clear_data:'Limpiar datos', nist_function_label:'Función NIST',
+        suggest_btn:'🔍 Sugerir controles', generating:'Generando...',
+        audited_company:'Empresa auditada', audited_company_ph:'Nombre de la empresa',
+        auditing_company:'Empresa auditora', auditing_company_ph:'Tu consultora o SOC',
+        auditor_label:'Auditor responsable', auditor_ph:'Nombre y rol',
+        scope_label:'Alcance de la auditoría', scope_ph:'Sistemas, red, aplicaciones, etc.',
+        report_id_label:'ID del informe', report_id_ph:'Ej: INF-2025-001',
+        audit_date_label:'Fecha de auditoría', add_control_btn:'+ Añadir Control',
+        generate_pdf_btn:'📄 Generar Informe PDF', export_txt_btn:'📄 Exportar como .txt',
+        save_progress_btn:'💾 Guardar Progreso', view_saved_btn:'📋 Ver Informes Guardados',
+        chart_compliance:'Cumplimiento', chart_risk:'Niveles de Riesgo',
+        problem_label:'Problemática detectada', select_placeholder:'-- Seleccionar --',
+        problem_other_ph:'Describa la otra problemática', solution_label:'Solución recomendada',
+        solution_other_ph:'Describa la otra solución', control_label:'Control',
+        complies_label:'Cumple', yes:'Sí', no:'No', partial:'Parcial',
+        risk_label:'Riesgo', high:'Alto', medium:'Medio', low:'Bajo',
+        evidence_label:'Evidencia', ai_evidence_btn:'✍️ IA Evidencia',
+        evidence_ph:'Describe la evidencia', total_controls:'Controles',
+        compliant:'Cumplidos ✅', non_compliant:'No cumplidos ❌', high_risks:'Riesgos ALTO ⚠️',
+        write_notes_alert:'🛑 Escribe tus notas', err_evidence:'⚠️ Error al generar evidencia: ',
+        err_suggestions:'⚠️ Error al generar sugerencias: ', saved_ok:'✅ Informe guardado localmente.',
+        no_saved_reports:'⚠️ No se encontró ningún informe guardado.',
+        no_reports_yet:'No hay informes guardados aún.',
+        need_company_err:'🛑 Debes completar Empresa auditada y Auditora antes de generar el PDF.',
+        pdf_err:'⚠️ Error al generar PDF: ', err_ollama:'⚠️ Error al conectarse con Ollama: ',
+        pdf_title:'Informe de Auditoría NIST CSF', pdf_report_id:'ID Informe',
+        pdf_audited_company:'Empresa auditada', pdf_auditing_company:'Empresa auditora',
+        pdf_auditor:'Auditor', pdf_scope:'Alcance', pdf_date:'Fecha',
+        pdf_controls_heading:'Controles Auditados', pdf_control:'CONTROL',
+        pdf_not_specified:'No especificado', pdf_no_evidence:'(Sin evidencia)',
+        pdf_problem:'Problemática', pdf_solution:'Solución', pdf_complies:'Cumple',
+        pdf_risk:'Riesgo', pdf_evidence:'Evidencia', txt_controls_heading:'Controles Auditados:',
+        other:'Otro...',
+        prob_0:'Contraseñas débiles o compartidas', prob_1:'Accesos sin control ni registros',
+        prob_2:'Ausencia de backups o no probados', prob_3:'Actualizaciones pendientes',
+        prob_4:'Logs desactivados o ignorados', prob_5:'Falta de formación',
+        prob_6:'Antivirus/firewall sin actualizar', prob_7:'Uso inadecuado de herramientas ofensivas',
+        prob_8:'Usuarios inactivos', prob_9:'Red mal segmentada', prob_10:'Otro...',
+        sol_0:'Aplicar política de contraseñas robustas y únicas',
+        sol_1:'Implementar control de acceso y registro de auditoría',
+        sol_2:'Establecer políticas de backup automatizado',
+        sol_3:'Mantener el software y sistemas actualizados',
+        sol_4:'Activar y revisar logs periódicamente',
+        sol_5:'Realizar formaciones de concienciación en ciberseguridad',
+        sol_6:'Actualizar o sustituir el antivirus/firewall',
+        sol_7:'Establecer reglas y control sobre el uso de herramientas ofensivas',
+        sol_8:'Auditar y eliminar usuarios inactivos regularmente',
+        sol_9:'Segregar la red por VLANs o zonas de confianza', sol_10:'Otro...'
+      },
+      en: {
+        clear_data:'Clear Data', nist_function_label:'NIST Function',
+        suggest_btn:'🔍 Suggest Controls', generating:'Generating...',
+        audited_company:'Audited Company', audited_company_ph:'Company name',
+        auditing_company:'Auditing Company', auditing_company_ph:'Your consultancy or SOC',
+        auditor_label:'Lead Auditor', auditor_ph:'Name and role',
+        scope_label:'Audit Scope', scope_ph:'Systems, network, applications, etc.',
+        report_id_label:'Report ID', report_id_ph:'Ex: INF-2025-001',
+        audit_date_label:'Audit Date', add_control_btn:'+ Add Control',
+        generate_pdf_btn:'📄 Generate PDF Report', export_txt_btn:'📄 Export as .txt',
+        save_progress_btn:'💾 Save Progress', view_saved_btn:'📋 View Saved Reports',
+        chart_compliance:'Compliance', chart_risk:'Risk Levels',
+        problem_label:'Detected Problem', select_placeholder:'-- Select --',
+        problem_other_ph:'Describe the other problem', solution_label:'Recommended Solution',
+        solution_other_ph:'Describe the other solution', control_label:'Control',
+        complies_label:'Complies', yes:'Yes', no:'No', partial:'Partial',
+        risk_label:'Risk', high:'High', medium:'Medium', low:'Low',
+        evidence_label:'Evidence', ai_evidence_btn:'✍️ AI Evidence',
+        evidence_ph:'Describe the evidence', total_controls:'Controls',
+        compliant:'Compliant ✅', non_compliant:'Non-Compliant ❌', high_risks:'HIGH Risks ⚠️',
+        write_notes_alert:'🛑 Write your notes first', err_evidence:'⚠️ Error generating evidence: ',
+        err_suggestions:'⚠️ Error generating suggestions: ', saved_ok:'✅ Report saved locally.',
+        no_saved_reports:'⚠️ No saved report found.', no_reports_yet:'No reports saved yet.',
+        need_company_err:'🛑 Please fill in Audited Company and Auditing Company before generating PDF.',
+        pdf_err:'⚠️ Error generating PDF: ', err_ollama:'⚠️ Error connecting to Ollama: ',
+        pdf_title:'NIST CSF Audit Report', pdf_report_id:'Report ID',
+        pdf_audited_company:'Audited Company', pdf_auditing_company:'Auditing Company',
+        pdf_auditor:'Auditor', pdf_scope:'Scope', pdf_date:'Date',
+        pdf_controls_heading:'Audited Controls', pdf_control:'CONTROL',
+        pdf_not_specified:'Not specified', pdf_no_evidence:'(No evidence)',
+        pdf_problem:'Problem', pdf_solution:'Solution', pdf_complies:'Complies',
+        pdf_risk:'Risk', pdf_evidence:'Evidence', txt_controls_heading:'Audited Controls:',
+        other:'Other...',
+        prob_0:'Weak or shared passwords', prob_1:'Uncontrolled access with no audit logs',
+        prob_2:'Missing or untested backups', prob_3:'Pending software updates',
+        prob_4:'Disabled or ignored logs', prob_5:'Lack of security training',
+        prob_6:'Outdated antivirus/firewall', prob_7:'Improper use of offensive tools',
+        prob_8:'Inactive user accounts', prob_9:'Poorly segmented network', prob_10:'Other...',
+        sol_0:'Apply strong, unique password policies',
+        sol_1:'Implement access control and audit logging',
+        sol_2:'Establish automated backup policies',
+        sol_3:'Keep software and systems up to date',
+        sol_4:'Enable and review logs regularly',
+        sol_5:'Conduct cybersecurity awareness training',
+        sol_6:'Update or replace antivirus/firewall',
+        sol_7:'Establish rules for the use of offensive tools',
+        sol_8:'Audit and remove inactive users regularly',
+        sol_9:'Segment the network using VLANs or trust zones', sol_10:'Other...'
+      },
+      fr: {
+        clear_data:'Effacer les données', nist_function_label:'Fonction NIST',
+        suggest_btn:'🔍 Suggérer des contrôles', generating:'Génération...',
+        audited_company:'Entreprise auditée', audited_company_ph:"Nom de l'entreprise",
+        auditing_company:'Entreprise auditrice', auditing_company_ph:'Votre cabinet ou SOC',
+        auditor_label:'Auditeur responsable', auditor_ph:'Nom et rôle',
+        scope_label:"Périmètre d'audit", scope_ph:'Systèmes, réseau, applications, etc.',
+        report_id_label:'ID du rapport', report_id_ph:'Ex : INF-2025-001',
+        audit_date_label:"Date d'audit", add_control_btn:'+ Ajouter un contrôle',
+        generate_pdf_btn:'📄 Générer le rapport PDF', export_txt_btn:'📄 Exporter en .txt',
+        save_progress_btn:'💾 Sauvegarder la progression', view_saved_btn:'📋 Voir les rapports sauvegardés',
+        chart_compliance:'Conformité', chart_risk:'Niveaux de risque',
+        problem_label:'Problème détecté', select_placeholder:'-- Sélectionner --',
+        problem_other_ph:"Décrivez l'autre problème", solution_label:'Solution recommandée',
+        solution_other_ph:"Décrivez l'autre solution", control_label:'Contrôle',
+        complies_label:'Conforme', yes:'Oui', no:'Non', partial:'Partiel',
+        risk_label:'Risque', high:'Élevé', medium:'Moyen', low:'Faible',
+        evidence_label:'Preuve', ai_evidence_btn:'✍️ IA Preuve',
+        evidence_ph:'Décrivez la preuve', total_controls:'Contrôles',
+        compliant:'Conformes ✅', non_compliant:'Non conformes ❌', high_risks:'Risques ÉLEVÉS ⚠️',
+        write_notes_alert:'🛑 Écrivez vos notes', err_evidence:'⚠️ Erreur génération preuve : ',
+        err_suggestions:'⚠️ Erreur génération suggestions : ', saved_ok:'✅ Rapport sauvegardé localement.',
+        no_saved_reports:'⚠️ Aucun rapport sauvegardé trouvé.', no_reports_yet:'Aucun rapport sauvegardé.',
+        need_company_err:'🛑 Veuillez compléter Entreprise auditée et Auditrice avant de générer le PDF.',
+        pdf_err:'⚠️ Erreur génération PDF : ', err_ollama:'⚠️ Erreur connexion Ollama : ',
+        pdf_title:"Rapport d'audit NIST CSF", pdf_report_id:'ID Rapport',
+        pdf_audited_company:'Entreprise auditée', pdf_auditing_company:'Entreprise auditrice',
+        pdf_auditor:'Auditeur', pdf_scope:'Périmètre', pdf_date:'Date',
+        pdf_controls_heading:'Contrôles audités', pdf_control:'CONTRÔLE',
+        pdf_not_specified:'Non spécifié', pdf_no_evidence:'(Aucune preuve)',
+        pdf_problem:'Problème', pdf_solution:'Solution', pdf_complies:'Conforme',
+        pdf_risk:'Risque', pdf_evidence:'Preuve', txt_controls_heading:'Contrôles audités :',
+        other:'Autre...',
+        prob_0:'Mots de passe faibles ou partagés', prob_1:'Accès non contrôlés sans journaux',
+        prob_2:'Sauvegardes absentes ou non testées', prob_3:'Mises à jour en attente',
+        prob_4:'Journaux désactivés ou ignorés', prob_5:'Manque de formation',
+        prob_6:'Antivirus/pare-feu non mis à jour', prob_7:"Utilisation inappropriée d'outils offensifs",
+        prob_8:'Comptes utilisateurs inactifs', prob_9:'Réseau mal segmenté', prob_10:'Autre...',
+        sol_0:'Appliquer une politique de mots de passe forts et uniques',
+        sol_1:"Mettre en place le contrôle d'accès et la journalisation",
+        sol_2:'Établir des politiques de sauvegarde automatisée',
+        sol_3:'Maintenir les logiciels et systèmes à jour',
+        sol_4:'Activer et examiner les journaux régulièrement',
+        sol_5:'Réaliser des formations de sensibilisation à la cybersécurité',
+        sol_6:'Mettre à jour ou remplacer l\'antivirus/pare-feu',
+        sol_7:'Établir des règles pour l\'utilisation des outils offensifs',
+        sol_8:'Auditer et supprimer régulièrement les utilisateurs inactifs',
+        sol_9:'Segmenter le réseau par VLANs ou zones de confiance', sol_10:'Autre...'
+      },
+      de: {
+        clear_data:'Daten löschen', nist_function_label:'NIST-Funktion',
+        suggest_btn:'🔍 Kontrollen vorschlagen', generating:'Generiere...',
+        audited_company:'Geprüftes Unternehmen', audited_company_ph:'Unternehmensname',
+        auditing_company:'Prüfendes Unternehmen', auditing_company_ph:'Ihre Beratungsfirma oder SOC',
+        auditor_label:'Verantwortlicher Prüfer', auditor_ph:'Name und Rolle',
+        scope_label:'Prüfungsumfang', scope_ph:'Systeme, Netzwerk, Anwendungen, usw.',
+        report_id_label:'Bericht-ID', report_id_ph:'Bsp: INF-2025-001',
+        audit_date_label:'Prüfdatum', add_control_btn:'+ Kontrolle hinzufügen',
+        generate_pdf_btn:'📄 PDF-Bericht erstellen', export_txt_btn:'📄 Als .txt exportieren',
+        save_progress_btn:'💾 Fortschritt speichern', view_saved_btn:'📋 Gespeicherte Berichte',
+        chart_compliance:'Konformität', chart_risk:'Risikostufen',
+        problem_label:'Erkanntes Problem', select_placeholder:'-- Auswählen --',
+        problem_other_ph:'Beschreiben Sie das andere Problem', solution_label:'Empfohlene Lösung',
+        solution_other_ph:'Beschreiben Sie die andere Lösung', control_label:'Kontrolle',
+        complies_label:'Konform', yes:'Ja', no:'Nein', partial:'Teilweise',
+        risk_label:'Risiko', high:'Hoch', medium:'Mittel', low:'Niedrig',
+        evidence_label:'Nachweis', ai_evidence_btn:'✍️ KI-Nachweis',
+        evidence_ph:'Nachweis beschreiben', total_controls:'Kontrollen',
+        compliant:'Konform ✅', non_compliant:'Nicht konform ❌', high_risks:'HOHE Risiken ⚠️',
+        write_notes_alert:'🛑 Bitte zuerst Notizen eingeben', err_evidence:'⚠️ Fehler Nachweis: ',
+        err_suggestions:'⚠️ Fehler Vorschläge: ', saved_ok:'✅ Bericht lokal gespeichert.',
+        no_saved_reports:'⚠️ Kein gespeicherter Bericht gefunden.', no_reports_yet:'Keine Berichte gespeichert.',
+        need_company_err:'🛑 Bitte Unternehmen und Prüfer ausfüllen, bevor das PDF erstellt wird.',
+        pdf_err:'⚠️ Fehler PDF: ', err_ollama:'⚠️ Fehler Ollama-Verbindung: ',
+        pdf_title:'NIST CSF Prüfbericht', pdf_report_id:'Bericht-ID',
+        pdf_audited_company:'Geprüftes Unternehmen', pdf_auditing_company:'Prüfendes Unternehmen',
+        pdf_auditor:'Prüfer', pdf_scope:'Umfang', pdf_date:'Datum',
+        pdf_controls_heading:'Geprüfte Kontrollen', pdf_control:'KONTROLLE',
+        pdf_not_specified:'Nicht angegeben', pdf_no_evidence:'(Kein Nachweis)',
+        pdf_problem:'Problem', pdf_solution:'Lösung', pdf_complies:'Konform',
+        pdf_risk:'Risiko', pdf_evidence:'Nachweis', txt_controls_heading:'Geprüfte Kontrollen:',
+        other:'Sonstige...',
+        prob_0:'Schwache oder geteilte Passwörter', prob_1:'Unkontrollierter Zugriff ohne Protokolle',
+        prob_2:'Fehlende oder ungetestete Backups', prob_3:'Ausstehende Software-Updates',
+        prob_4:'Deaktivierte oder ignorierte Protokolle', prob_5:'Mangelnde Schulung',
+        prob_6:'Veralteter Virenschutz/Firewall', prob_7:'Unsachgemäßer Einsatz offensiver Werkzeuge',
+        prob_8:'Inaktive Benutzerkonten', prob_9:'Schlecht segmentiertes Netzwerk', prob_10:'Sonstige...',
+        sol_0:'Starke, einzigartige Passwortrichtlinien einführen',
+        sol_1:'Zugangskontrolle und Protokollierung implementieren',
+        sol_2:'Automatisierte Backup-Richtlinien einrichten',
+        sol_3:'Software und Systeme aktuell halten',
+        sol_4:'Protokolle aktivieren und regelmäßig prüfen',
+        sol_5:'Cybersecurity-Schulungen durchführen',
+        sol_6:'Virenschutz/Firewall aktualisieren oder ersetzen',
+        sol_7:'Regeln für den Einsatz offensiver Werkzeuge festlegen',
+        sol_8:'Inaktive Benutzer regelmäßig prüfen und entfernen',
+        sol_9:'Netzwerk durch VLANs segmentieren', sol_10:'Sonstige...'
+      },
+      pt: {
+        clear_data:'Limpar dados', nist_function_label:'Função NIST',
+        suggest_btn:'🔍 Sugerir controles', generating:'Gerando...',
+        audited_company:'Empresa auditada', audited_company_ph:'Nome da empresa',
+        auditing_company:'Empresa auditora', auditing_company_ph:'Sua consultoria ou SOC',
+        auditor_label:'Auditor responsável', auditor_ph:'Nome e função',
+        scope_label:'Escopo da auditoria', scope_ph:'Sistemas, rede, aplicações, etc.',
+        report_id_label:'ID do relatório', report_id_ph:'Ex: INF-2025-001',
+        audit_date_label:'Data da auditoria', add_control_btn:'+ Adicionar Controle',
+        generate_pdf_btn:'📄 Gerar Relatório PDF', export_txt_btn:'📄 Exportar como .txt',
+        save_progress_btn:'💾 Salvar Progresso', view_saved_btn:'📋 Ver Relatórios Salvos',
+        chart_compliance:'Conformidade', chart_risk:'Níveis de Risco',
+        problem_label:'Problema detectado', select_placeholder:'-- Selecionar --',
+        problem_other_ph:'Descreva o outro problema', solution_label:'Solução recomendada',
+        solution_other_ph:'Descreva a outra solução', control_label:'Controle',
+        complies_label:'Cumpre', yes:'Sim', no:'Não', partial:'Parcial',
+        risk_label:'Risco', high:'Alto', medium:'Médio', low:'Baixo',
+        evidence_label:'Evidência', ai_evidence_btn:'✍️ IA Evidência',
+        evidence_ph:'Descreva a evidência', total_controls:'Controles',
+        compliant:'Conformes ✅', non_compliant:'Não conformes ❌', high_risks:'Riscos ALTOS ⚠️',
+        write_notes_alert:'🛑 Escreva suas notas primeiro', err_evidence:'⚠️ Erro ao gerar evidência: ',
+        err_suggestions:'⚠️ Erro ao gerar sugestões: ', saved_ok:'✅ Relatório salvo localmente.',
+        no_saved_reports:'⚠️ Nenhum relatório salvo encontrado.', no_reports_yet:'Nenhum relatório salvo.',
+        need_company_err:'🛑 Preencha a empresa auditada e auditora antes de gerar o PDF.',
+        pdf_err:'⚠️ Erro ao gerar PDF: ', err_ollama:'⚠️ Erro ao conectar ao Ollama: ',
+        pdf_title:'Relatório de Auditoria NIST CSF', pdf_report_id:'ID Relatório',
+        pdf_audited_company:'Empresa auditada', pdf_auditing_company:'Empresa auditora',
+        pdf_auditor:'Auditor', pdf_scope:'Escopo', pdf_date:'Data',
+        pdf_controls_heading:'Controles Auditados', pdf_control:'CONTROLE',
+        pdf_not_specified:'Não especificado', pdf_no_evidence:'(Sem evidência)',
+        pdf_problem:'Problema', pdf_solution:'Solução', pdf_complies:'Cumpre',
+        pdf_risk:'Risco', pdf_evidence:'Evidência', txt_controls_heading:'Controles Auditados:',
+        other:'Outro...',
+        prob_0:'Senhas fracas ou compartilhadas', prob_1:'Acessos sem controle nem registros',
+        prob_2:'Ausência de backups ou não testados', prob_3:'Atualizações pendentes',
+        prob_4:'Logs desativados ou ignorados', prob_5:'Falta de treinamento',
+        prob_6:'Antivírus/firewall desatualizado', prob_7:'Uso inadequado de ferramentas ofensivas',
+        prob_8:'Usuários inativos', prob_9:'Rede mal segmentada', prob_10:'Outro...',
+        sol_0:'Aplicar política de senhas fortes e exclusivas',
+        sol_1:'Implementar controle de acesso e registro de auditoria',
+        sol_2:'Estabelecer políticas de backup automatizado',
+        sol_3:'Manter software e sistemas atualizados',
+        sol_4:'Ativar e revisar logs periodicamente',
+        sol_5:'Realizar treinamentos de conscientização em cibersegurança',
+        sol_6:'Atualizar ou substituir antivírus/firewall',
+        sol_7:'Estabelecer regras para o uso de ferramentas ofensivas',
+        sol_8:'Auditar e remover usuários inativos regularmente',
+        sol_9:'Segmentar a rede por VLANs ou zonas de confiança', sol_10:'Outro...'
+      },
+      ar: {
+        clear_data:'مسح البيانات', nist_function_label:'وظيفة NIST',
+        suggest_btn:'🔍 اقتراح ضوابط', generating:'جارٍ التوليد...',
+        audited_company:'الشركة المُدققة', audited_company_ph:'اسم الشركة',
+        auditing_company:'شركة التدقيق', auditing_company_ph:'استشارتك أو مركز العمليات الأمنية',
+        auditor_label:'المدقق المسؤول', auditor_ph:'الاسم والدور',
+        scope_label:'نطاق التدقيق', scope_ph:'الأنظمة والشبكة والتطبيقات إلخ.',
+        report_id_label:'معرف التقرير', report_id_ph:'مثال: INF-2025-001',
+        audit_date_label:'تاريخ التدقيق', add_control_btn:'+ إضافة ضابط',
+        generate_pdf_btn:'📄 إنشاء تقرير PDF', export_txt_btn:'📄 تصدير كـ .txt',
+        save_progress_btn:'💾 حفظ التقدم', view_saved_btn:'📋 عرض التقارير المحفوظة',
+        chart_compliance:'الامتثال', chart_risk:'مستويات المخاطر',
+        problem_label:'المشكلة المكتشفة', select_placeholder:'-- اختر --',
+        problem_other_ph:'صف المشكلة الأخرى', solution_label:'الحل الموصى به',
+        solution_other_ph:'صف الحل الآخر', control_label:'الضابط',
+        complies_label:'يمتثل', yes:'نعم', no:'لا', partial:'جزئي',
+        risk_label:'المخاطرة', high:'عالٍ', medium:'متوسط', low:'منخفض',
+        evidence_label:'الدليل', ai_evidence_btn:'✍️ دليل الذكاء الاصطناعي',
+        evidence_ph:'صف الدليل', total_controls:'الضوابط',
+        compliant:'ممتثل ✅', non_compliant:'غير ممتثل ❌', high_risks:'مخاطر عالية ⚠️',
+        write_notes_alert:'🛑 اكتب ملاحظاتك أولاً', err_evidence:'⚠️ خطأ في توليد الدليل: ',
+        err_suggestions:'⚠️ خطأ في توليد الاقتراحات: ', saved_ok:'✅ تم حفظ التقرير محلياً.',
+        no_saved_reports:'⚠️ لم يُعثر على أي تقرير محفوظ.', no_reports_yet:'لا توجد تقارير محفوظة بعد.',
+        need_company_err:'🛑 الرجاء إكمال الشركة المُدققة وشركة التدقيق قبل إنشاء PDF.',
+        pdf_err:'⚠️ خطأ في إنشاء PDF: ', err_ollama:'⚠️ خطأ في الاتصال بـ Ollama: ',
+        pdf_title:'تقرير تدقيق NIST CSF', pdf_report_id:'معرف التقرير',
+        pdf_audited_company:'الشركة المُدققة', pdf_auditing_company:'شركة التدقيق',
+        pdf_auditor:'المدقق', pdf_scope:'النطاق', pdf_date:'التاريخ',
+        pdf_controls_heading:'الضوابط المدققة', pdf_control:'ضابط',
+        pdf_not_specified:'غير محدد', pdf_no_evidence:'(لا يوجد دليل)',
+        pdf_problem:'المشكلة', pdf_solution:'الحل', pdf_complies:'يمتثل',
+        pdf_risk:'المخاطرة', pdf_evidence:'الدليل', txt_controls_heading:'الضوابط المدققة:',
+        other:'أخرى...',
+        prob_0:'كلمات مرور ضعيفة أو مشتركة', prob_1:'وصول غير مسيطر عليه بدون سجلات',
+        prob_2:'غياب النسخ الاحتياطية أو عدم اختبارها', prob_3:'تحديثات معلقة',
+        prob_4:'سجلات معطلة أو مهملة', prob_5:'نقص في التدريب',
+        prob_6:'مضاد فيروسات/جدار حماية قديم', prob_7:'الاستخدام غير الملائم لأدوات الهجوم',
+        prob_8:'حسابات مستخدمين غير نشطة', prob_9:'شبكة سيئة التجزئة', prob_10:'أخرى...',
+        sol_0:'تطبيق سياسة كلمات مرور قوية وفريدة',
+        sol_1:'تنفيذ التحكم في الوصول وتسجيل الأحداث',
+        sol_2:'إنشاء سياسات نسخ احتياطي آلية',
+        sol_3:'إبقاء البرامج والأنظمة محدثة',
+        sol_4:'تفعيل ومراجعة السجلات بصفة دورية',
+        sol_5:'إجراء تدريبات التوعية بالأمن السيبراني',
+        sol_6:'تحديث أو استبدال مضاد الفيروسات/جدار الحماية',
+        sol_7:'وضع قواعد للتحكم في استخدام أدوات الهجوم',
+        sol_8:'مراجعة وحذف المستخدمين غير النشطين بانتظام',
+        sol_9:'تجزئة الشبكة باستخدام VLANs أو مناطق الثقة', sol_10:'أخرى...'
+      },
+      zh: {
+        clear_data:'清除数据', nist_function_label:'NIST 功能',
+        suggest_btn:'🔍 建议控制项', generating:'生成中...',
+        audited_company:'被审计公司', audited_company_ph:'公司名称',
+        auditing_company:'审计公司', auditing_company_ph:'您的咨询公司或安全运营中心',
+        auditor_label:'负责审计员', auditor_ph:'姓名及职务',
+        scope_label:'审计范围', scope_ph:'系统、网络、应用程序等',
+        report_id_label:'报告编号', report_id_ph:'例：INF-2025-001',
+        audit_date_label:'审计日期', add_control_btn:'+ 添加控制项',
+        generate_pdf_btn:'📄 生成 PDF 报告', export_txt_btn:'📄 导出为 .txt',
+        save_progress_btn:'💾 保存进度', view_saved_btn:'📋 查看已保存报告',
+        chart_compliance:'合规情况', chart_risk:'风险级别',
+        problem_label:'发现的问题', select_placeholder:'-- 请选择 --',
+        problem_other_ph:'描述其他问题', solution_label:'推荐解决方案',
+        solution_other_ph:'描述其他解决方案', control_label:'控制项',
+        complies_label:'是否合规', yes:'是', no:'否', partial:'部分',
+        risk_label:'风险', high:'高', medium:'中', low:'低',
+        evidence_label:'证据', ai_evidence_btn:'✍️ AI 证据',
+        evidence_ph:'描述证据', total_controls:'控制项',
+        compliant:'合规 ✅', non_compliant:'不合规 ❌', high_risks:'高风险 ⚠️',
+        write_notes_alert:'🛑 请先填写您的笔记', err_evidence:'⚠️ 生成证据时出错：',
+        err_suggestions:'⚠️ 生成建议时出错：', saved_ok:'✅ 报告已本地保存。',
+        no_saved_reports:'⚠️ 未找到已保存的报告。', no_reports_yet:'尚未保存任何报告。',
+        need_company_err:'🛑 请在生成 PDF 前填写被审计公司和审计公司信息。',
+        pdf_err:'⚠️ 生成 PDF 时出错：', err_ollama:'⚠️ 连接 Ollama 时出错：',
+        pdf_title:'NIST CSF 审计报告', pdf_report_id:'报告编号',
+        pdf_audited_company:'被审计公司', pdf_auditing_company:'审计公司',
+        pdf_auditor:'审计员', pdf_scope:'范围', pdf_date:'日期',
+        pdf_controls_heading:'审计控制项', pdf_control:'控制项',
+        pdf_not_specified:'未指定', pdf_no_evidence:'（无证据）',
+        pdf_problem:'问题', pdf_solution:'解决方案', pdf_complies:'是否合规',
+        pdf_risk:'风险', pdf_evidence:'证据', txt_controls_heading:'审计控制项：',
+        other:'其他...',
+        prob_0:'密码薄弱或共享', prob_1:'无控制的访问且无日志记录',
+        prob_2:'缺少备份或备份未经测试', prob_3:'待处理的更新',
+        prob_4:'日志已禁用或被忽略', prob_5:'缺乏培训',
+        prob_6:'防病毒/防火墙未更新', prob_7:'不当使用攻击性工具',
+        prob_8:'不活跃用户账户', prob_9:'网络分段不良', prob_10:'其他...',
+        sol_0:'实施强密码且唯一的密码策略',
+        sol_1:'实施访问控制和审计日志记录',
+        sol_2:'建立自动化备份策略',
+        sol_3:'保持软件和系统更新',
+        sol_4:'定期启用和审查日志',
+        sol_5:'开展网络安全意识培训',
+        sol_6:'更新或替换防病毒/防火墙',
+        sol_7:'制定攻击性工具使用规则',
+        sol_8:'定期审核并删除不活跃用户',
+        sol_9:'通过 VLAN 或信任区域对网络进行分段', sol_10:'其他...'
+      }
+    };
 
-    // Función para conectarse a Ollama
+    // ── i18n helpers ─────────────────────────────────────────────────────────
+    let currentLang = 'es';
+    function T(key) { return (TRANSLATIONS[currentLang] || TRANSLATIONS.es)[key] || TRANSLATIONS.es[key] || key; }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('auditnist_lang', lang);
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+      // Static elements
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = T(el.getAttribute('data-i18n'));
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = T(el.getAttribute('data-i18n-placeholder'));
+      });
+
+      // Existing control blocks
+      document.querySelectorAll('.control').forEach(blk => {
+        // Labels inside block
+        blk.querySelectorAll('[data-i18n]').forEach(el => {
+          el.textContent = T(el.getAttribute('data-i18n'));
+        });
+
+        // Problem dropdown (preserve selection)
+        const probSel = blk.querySelector('.problem');
+        const probVal = probSel.value;
+        probSel.innerHTML = `<option value="">${T('select_placeholder')}</option>` +
+          [...Array(11).keys()].map(i => `<option value="${i}">${T('prob_' + i)}</option>`).join('');
+        probSel.value = probVal;
+        blk.querySelector('.problem-other').placeholder = T('problem_other_ph');
+
+        // Solution dropdown (preserve selection)
+        const solSel = blk.querySelector('.solution');
+        const solVal = solSel.value;
+        solSel.innerHTML = `<option value="">${T('select_placeholder')}</option>` +
+          [...Array(11).keys()].map(i => `<option value="${i}">${T('sol_' + i)}</option>`).join('');
+        solSel.value = solVal;
+        blk.querySelector('.solution-other').placeholder = T('solution_other_ph');
+
+        // Compliance dropdown (preserve selection, neutral values)
+        const cumpleSel = blk.querySelector('.cumple');
+        const cumpleVal = cumpleSel.value;
+        cumpleSel.innerHTML = `<option value="">--</option>
+          <option value="yes">${T('yes')}</option>
+          <option value="no">${T('no')}</option>
+          <option value="partial">${T('partial')}</option>`;
+        cumpleSel.value = cumpleVal;
+
+        // Risk dropdown (preserve selection, neutral values)
+        const riesgoSel = blk.querySelector('.riesgo');
+        const riesgoVal = riesgoSel.value;
+        riesgoSel.innerHTML = `<option value="">--</option>
+          <option value="high">${T('high')}</option>
+          <option value="medium">${T('medium')}</option>
+          <option value="low">${T('low')}</option>`;
+        riesgoSel.value = riesgoVal;
+
+        blk.querySelector('.evidencia').placeholder = T('evidence_ph');
+      });
+
+      // Chart labels
+      if (chartComp) { chartComp.data.labels = [T('yes'), T('no'), T('partial')]; chartComp.update(); }
+      if (chartRisk) { chartRisk.data.labels = [T('high'), T('medium'), T('low')]; chartRisk.update(); }
+
+      // Language selector sync
+      const ls = document.getElementById('lang-select');
+      if (ls) ls.value = lang;
+
+      updateSummary();
+    }
+
+    // ── AI (Ollama local) ─────────────────────────────────────────────────────
     async function fetchLocal(prompt) {
       try {
         const res = await fetch('http://localhost:11434/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'llama3',
-            prompt,
-            stream: false
-          })
+          body: JSON.stringify({ model: 'llama3', prompt, stream: false })
         });
-
-        if (!res.ok) throw new Error("Error en servidor local");
+        if (!res.ok) throw new Error('Server error');
         const data = await res.json();
         return data.response.trim();
-
       } catch (e) {
-        alert('⚠️ Error al conectarse con Ollama: ' + e.message);
+        alert(T('err_ollama') + e.message);
         throw e;
       }
     }
 
-    // Sugerir controles con Llama3 local
     async function suggestControls() {
       const btn = document.getElementById('suggest-controls');
       btn.disabled = true;
-      document.getElementById('suggest-status').textContent = 'Generando...';
-
+      document.getElementById('suggest-status').textContent = T('generating');
       try {
-        const functionSelected = document.getElementById('nist-function').value;
-        const prompt = `
-Dame 5 controles NIST CSF (código + nombre) para la función "${functionSelected}".
-Devuelve SOLO un array JSON válido:
-[
-  {"code": "PR.AC-1", "name": "Access Control Policy"},
-  ...
-]
-NO añadas texto adicional.
-`;
-
+        const fn = document.getElementById('nist-function').value;
+        const prompt = `List 5 NIST CSF controls (code + name) for the "${fn}" function. Return ONLY a valid JSON array:\n[{"code":"PR.AC-1","name":"Access Control Policy"},...]\nNo extra text.`;
         const response = await fetchLocal(prompt);
-
-        // Limpieza básica de respuesta
-        let cleanResponse = response.replace(/^[^{[]+/i, '').trim();
-        const match = cleanResponse.match(/\[[\s\S]*\]|\{[\s\S]*\}/);
-        if (!match) throw new Error("JSON inválido en la respuesta");
-
+        const match = response.replace(/^[^\[{]*/,'').match(/\[[\s\S]*\]/);
+        if (!match) throw new Error('Invalid JSON');
         const list = JSON.parse(match[0]);
-
         document.getElementById('suggested-controls').innerHTML =
-          list.map(c =>
-            `<button onclick="addSuggestedControl('${c.code} – ${c.name}')"
-                     class="px-3 py-1 bg-gray-600 text-white rounded">${c.code}</button>`
-          ).join('');
-
+          list.map(c => `<button onclick="addSuggestedControl('${c.code} – ${c.name}')"
+            class="px-3 py-1 bg-gray-600 text-white rounded">${c.code}</button>`).join('');
       } catch (e) {
-        alert('⚠️ Error al generar sugerencias: ' + e.message);
+        alert(T('err_suggestions') + e.message);
       } finally {
         document.getElementById('suggest-status').textContent = '';
         btn.disabled = false;
@@ -255,402 +632,321 @@ NO añadas texto adicional.
     function addSuggestedControl(text) {
       addControl();
       const ctrls = document.querySelectorAll('.ctrl');
-      if (ctrls.length > 0) {
-        ctrls[ctrls.length - 1].value = text;
-        updateAll();
-      }
+      if (ctrls.length > 0) { ctrls[ctrls.length - 1].value = text; updateAll(); }
     }
 
-    // Auto-evidencia con IA local
     async function autoFillEvidence(btn) {
       const textarea = btn.nextElementSibling;
       const notes = textarea.value.trim();
-
-      if (!notes) {
-        alert('🛑 Escribe tus notas');
-        return;
-      }
-
+      if (!notes) { alert(T('write_notes_alert')); return; }
       btn.disabled = true;
       try {
-        const prompt = `A partir de estas notas: "${notes}", redacta un párrafo formal de evidencia.`;
-        const response = await fetchLocal(prompt);
-        textarea.value = response;
+        const prompt = `From these notes: "${notes}", write a formal audit evidence paragraph.`;
+        textarea.value = await fetchLocal(prompt);
         updateAll();
       } catch (e) {
-        alert('⚠️ Error al generar evidencia: ' + e.message);
+        alert(T('err_evidence') + e.message);
       } finally {
         btn.disabled = false;
       }
     }
 
-    // Charts
+    // ── Charts ────────────────────────────────────────────────────────────────
     let chartComp, chartRisk;
     function initCharts() {
       chartComp = new Chart(document.getElementById('chartCompliance').getContext('2d'), {
         type: 'doughnut',
-        data: {
-          labels: ['Sí', 'No', 'Parcial'],
-          datasets: [{ data: [0, 0, 0], backgroundColor: ['#22c55e', '#ef4444', '#facc15'] }]
-        }
+        data: { labels: [T('yes'), T('no'), T('partial')],
+                datasets: [{ data: [0,0,0], backgroundColor: ['#22c55e','#ef4444','#facc15'] }] }
       });
       chartRisk = new Chart(document.getElementById('chartRisk').getContext('2d'), {
         type: 'bar',
-        data: {
-          labels: ['Alto', 'Medio', 'Bajo'],
-          datasets: [{
-            label: 'Controles',
-            data: [0, 0, 0],
-            backgroundColor: ['#ef4444', '#facc15', '#22c55e']
-          }]
-        },
-        options: {
-          scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
-          plugins: { legend: { display: false } }
-        }
+        data: { labels: [T('high'), T('medium'), T('low')],
+                datasets: [{ label: T('total_controls'), data: [0,0,0],
+                             backgroundColor: ['#ef4444','#facc15','#22c55e'] }] },
+        options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                   plugins: { legend: { display: false } } }
       });
     }
 
-    // Añadir control manual
+    // ── Control blocks ────────────────────────────────────────────────────────
     function addControl() {
       const wrapper = document.createElement('div');
       wrapper.className = 'control bg-gray-800 p-4 rounded border border-gray-700 relative';
-      const makeOpts = arr => arr.map(o => `<option value="${o}">${o}</option>`).join('');
+      const probOpts = `<option value="">${T('select_placeholder')}</option>` +
+        [...Array(11).keys()].map(i => `<option value="${i}">${T('prob_' + i)}</option>`).join('');
+      const solOpts = `<option value="">${T('select_placeholder')}</option>` +
+        [...Array(11).keys()].map(i => `<option value="${i}">${T('sol_' + i)}</option>`).join('');
       wrapper.innerHTML = `
         <button class="remove-btn absolute top-2 right-2 bg-cyberevil text-black px-2 py-1 rounded"
                 onclick="this.parentNode.remove(); updateAll()">×</button>
-        <label class="font-bold text-cyberaccent">Problemática detectada</label>
-        <select class="problem mt-1 w-full bg-gray-700 text-gray-100 p-2 rounded"
-                onchange="toggleOther(this)">
-          <option value="">-- Seleccionar --</option>${makeOpts(PROBLEMS)}
+        <label class="font-bold text-cyberaccent" data-i18n="problem_label">${T('problem_label')}</label>
+        <select class="problem mt-1 w-full bg-gray-700 text-gray-100 p-2 rounded" onchange="toggleOther(this)">
+          ${probOpts}
         </select>
         <input class="problem-other mt-1 w-full p-2 rounded bg-gray-700 text-gray-100 hidden"
-               placeholder="Describa la otra problemática"/>
-
-        <label class="font-bold text-cyberaccent mt-4">Solución recomendada</label>
-        <select class="solution mt-1 w-full bg-gray-700 text-gray-100 p-2 rounded"
-                onchange="toggleOther(this)">
-          <option value="">-- Seleccionar --</option>${makeOpts(SOLUTIONS)}
+               placeholder="${T('problem_other_ph')}"/>
+        <label class="font-bold text-cyberaccent mt-4" data-i18n="solution_label">${T('solution_label')}</label>
+        <select class="solution mt-1 w-full bg-gray-700 text-gray-100 p-2 rounded" onchange="toggleOther(this)">
+          ${solOpts}
         </select>
         <input class="solution-other mt-1 w-full p-2 rounded bg-gray-700 text-gray-100 hidden"
-               placeholder="Describa la otra solución"/>
-
-        <label class="font-bold text-cyberaccent mt-4">Control</label>
-        <input class="ctrl mt-1 w-full p-2 rounded bg-gray-700 text-gray-100"
-               placeholder="PR.AC-1"/>
-
+               placeholder="${T('solution_other_ph')}"/>
+        <label class="font-bold text-cyberaccent mt-4" data-i18n="control_label">${T('control_label')}</label>
+        <input class="ctrl mt-1 w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="PR.AC-1"/>
         <div class="grid grid-cols-2 gap-4 mt-4">
           <div>
-            <label class="font-bold text-cyberaccent">Cumple</label>
-            <select class="cumple mt-1 w-full bg-gray-700 text-gray-100 p-2 rounded"
-                    onchange="updateAll()">
-              <option value="">--</option><option>Sí</option><option>No</option><option>Parcial</option>
+            <label class="font-bold text-cyberaccent" data-i18n="complies_label">${T('complies_label')}</label>
+            <select class="cumple mt-1 w-full bg-gray-700 text-gray-100 p-2 rounded" onchange="updateAll()">
+              <option value="">--</option>
+              <option value="yes">${T('yes')}</option>
+              <option value="no">${T('no')}</option>
+              <option value="partial">${T('partial')}</option>
             </select>
           </div>
           <div>
-            <label class="font-bold text-cyberaccent">Riesgo</label>
-            <select class="riesgo mt-1 w-full bg-gray-700 text-gray-100 p-2 rounded"
-                    onchange="updateAll()">
-              <option value="">--</option><option>Alto</option><option>Medio</option><option>Bajo</option>
+            <label class="font-bold text-cyberaccent" data-i18n="risk_label">${T('risk_label')}</label>
+            <select class="riesgo mt-1 w-full bg-gray-700 text-gray-100 p-2 rounded" onchange="updateAll()">
+              <option value="">--</option>
+              <option value="high">${T('high')}</option>
+              <option value="medium">${T('medium')}</option>
+              <option value="low">${T('low')}</option>
             </select>
           </div>
         </div>
-
-        <label class="font-bold text-cyberaccent mt-4">Evidencia</label>
+        <label class="font-bold text-cyberaccent mt-4" data-i18n="evidence_label">${T('evidence_label')}</label>
         <button onclick="autoFillEvidence(this)"
-                class="mt-1 mb-2 px-2 py-1 bg-cyberwarn text-black rounded">
-          ✍️ IA Evidencia
-        </button>
+                class="mt-1 mb-2 px-2 py-1 bg-cyberwarn text-black rounded"
+                data-i18n="ai_evidence_btn">${T('ai_evidence_btn')}</button>
         <textarea class="evidencia mt-1 w-full p-2 rounded bg-gray-700 text-gray-100"
-                  rows="3" placeholder="Describe la evidencia"></textarea>
+                  rows="3" placeholder="${T('evidence_ph')}"></textarea>
       `;
       document.getElementById('controls').appendChild(wrapper);
       updateAll();
     }
 
     function toggleOther(sel) {
-      sel.nextElementSibling.classList.toggle('hidden', sel.value !== 'Otro...');
+      sel.nextElementSibling.classList.toggle('hidden', sel.value !== '10');
       updateAll();
     }
 
+    // ── Summary & charts update ───────────────────────────────────────────────
     function updateSummary() {
-      const cnt = document.querySelectorAll('.control').length;
-      const ok = [...document.querySelectorAll('.cumple')].filter(c => c.value === 'Sí').length;
-      const no = [...document.querySelectorAll('.cumple')].filter(c => c.value === 'No').length;
-      const alto = [...document.querySelectorAll('.riesgo')].filter(r => r.value === 'Alto').length;
-
-      document.getElementById('countTotal').textContent = `Controles: ${cnt}`;
-      document.getElementById('countOK').textContent = `Cumplidos ✅: ${ok}`;
-      document.getElementById('countFail').textContent = `No cumplidos ❌: ${no}`;
-      document.getElementById('countRisk').textContent = `Riesgos ALTO ⚠️: ${alto}`;
+      const cnt  = document.querySelectorAll('.control').length;
+      const ok   = [...document.querySelectorAll('.cumple')].filter(c => c.value === 'yes').length;
+      const no   = [...document.querySelectorAll('.cumple')].filter(c => c.value === 'no').length;
+      const alto = [...document.querySelectorAll('.riesgo')].filter(r => r.value === 'high').length;
+      document.getElementById('countTotal').textContent = `${T('total_controls')}: ${cnt}`;
+      document.getElementById('countOK').textContent    = `${T('compliant')}: ${ok}`;
+      document.getElementById('countFail').textContent  = `${T('non_compliant')}: ${no}`;
+      document.getElementById('countRisk').textContent  = `${T('high_risks')}: ${alto}`;
     }
 
     function updateCharts() {
       if (!chartComp || !chartRisk) return;
-
-      const ok = [...document.querySelectorAll('.cumple')].filter(c => c.value === 'Sí').length;
-      const no = [...document.querySelectorAll('.cumple')].filter(c => c.value === 'No').length;
-      const pa = [...document.querySelectorAll('.cumple')].filter(c => c.value === 'Parcial').length;
-      chartComp.data.datasets[0].data = [ok, no, pa];
-      chartComp.update();
-
-      const alto = [...document.querySelectorAll('.riesgo')].filter(r => r.value === 'Alto').length;
-      const med = [...document.querySelectorAll('.riesgo')].filter(r => r.value === 'Medio').length;
-      const baj = [...document.querySelectorAll('.riesgo')].filter(r => r.value === 'Bajo').length;
-      chartRisk.data.datasets[0].data = [alto, med, baj];
-      chartRisk.update();
+      const ok   = [...document.querySelectorAll('.cumple')].filter(c => c.value === 'yes').length;
+      const no   = [...document.querySelectorAll('.cumple')].filter(c => c.value === 'no').length;
+      const pa   = [...document.querySelectorAll('.cumple')].filter(c => c.value === 'partial').length;
+      chartComp.data.datasets[0].data = [ok, no, pa]; chartComp.update();
+      const alto = [...document.querySelectorAll('.riesgo')].filter(r => r.value === 'high').length;
+      const med  = [...document.querySelectorAll('.riesgo')].filter(r => r.value === 'medium').length;
+      const baj  = [...document.querySelectorAll('.riesgo')].filter(r => r.value === 'low').length;
+      chartRisk.data.datasets[0].data = [alto, med, baj]; chartRisk.update();
     }
 
-    function updateAll() {
-      updateSummary();
-      updateCharts();
-    }
+    function updateAll() { updateSummary(); updateCharts(); }
 
     function clearData() {
       ['empresa_auditada','empresa_auditora','auditor','alcance','id_informe','fecha']
         .forEach(id => document.getElementById(id).value = '');
       const ctrls = document.getElementById('controls');
       while (ctrls.firstChild) ctrls.removeChild(ctrls.firstChild);
-      updateAll();
-      addControl();
+      updateAll(); addControl();
     }
 
-    // --- Guardar progreso ---
+    // ── Save / Load ───────────────────────────────────────────────────────────
     function saveProgress() {
       const data = {
-        empresa: document.getElementById('empresa_auditada').value,
+        empresa:  document.getElementById('empresa_auditada').value,
         auditora: document.getElementById('empresa_auditora').value,
-        auditor: document.getElementById('auditor').value,
-        alcance: document.getElementById('alcance').value,
-        id: document.getElementById('id_informe').value || 'sinID',
-        fecha: document.getElementById('fecha').value || new Date().toLocaleDateString(),
+        auditor:  document.getElementById('auditor').value,
+        alcance:  document.getElementById('alcance').value,
+        id:       document.getElementById('id_informe').value || 'sinID',
+        fecha:    document.getElementById('fecha').value || new Date().toLocaleDateString(),
         controls: []
       };
-
       document.querySelectorAll('.control').forEach(blk => {
-        const controlData = {
-          problem: blk.querySelector('.problem').value,
+        data.controls.push({
+          problem:      blk.querySelector('.problem').value,
           problemOther: blk.querySelector('.problem-other').value,
-          solution: blk.querySelector('.solution').value,
-          solutionOther: blk.querySelector('.solution-other').value,
-          ctrl: blk.querySelector('.ctrl').value,
-          cumple: blk.querySelector('.cumple').value,
-          riesgo: blk.querySelector('.riesgo').value,
-          evidencia: blk.querySelector('.evidencia').value
-        };
-        data.controls.push(controlData);
+          solution:     blk.querySelector('.solution').value,
+          solutionOther:blk.querySelector('.solution-other').value,
+          ctrl:         blk.querySelector('.ctrl').value,
+          cumple:       blk.querySelector('.cumple').value,
+          riesgo:       blk.querySelector('.riesgo').value,
+          evidencia:    blk.querySelector('.evidencia').value
+        });
       });
-
       localStorage.setItem(`auditnist_${data.id}`, JSON.stringify(data));
-      alert("✅ Informe guardado localmente.");
+      alert(T('saved_ok'));
     }
 
     function loadProgress(id = 'ultimo') {
       const key = id === 'ultimo' ? getLatestReportKey() : `auditnist_${id}`;
       const saved = localStorage.getItem(key);
-
-      if (!saved) {
-        alert("⚠️ No se encontró ningún informe guardado.");
-        return;
-      }
-
+      if (!saved) { alert(T('no_saved_reports')); return; }
       const data = JSON.parse(saved);
       document.getElementById('empresa_auditada').value = data.empresa;
       document.getElementById('empresa_auditora').value = data.auditora;
-      document.getElementById('auditor').value = data.auditor;
-      document.getElementById('alcance').value = data.alcance;
+      document.getElementById('auditor').value  = data.auditor;
+      document.getElementById('alcance').value  = data.alcance;
       document.getElementById('id_informe').value = data.id;
-      document.getElementById('fecha').value = data.fecha;
-
+      document.getElementById('fecha').value    = data.fecha;
       const ctrlsContainer = document.getElementById('controls');
       while (ctrlsContainer.firstChild) ctrlsContainer.removeChild(ctrlsContainer.firstChild);
-
       data.controls.forEach(c => {
         addControl();
         const wrapper = document.querySelectorAll('.control')[document.querySelectorAll('.control').length - 1];
-
         wrapper.querySelector('.problem').value = c.problem;
         wrapper.querySelector('.problem-other').value = c.problemOther;
-        wrapper.querySelector('.problem-other').classList.toggle('hidden', c.problem !== 'Otro...');
-
+        wrapper.querySelector('.problem-other').classList.toggle('hidden', c.problem !== '10');
         wrapper.querySelector('.solution').value = c.solution;
         wrapper.querySelector('.solution-other').value = c.solutionOther;
-        wrapper.querySelector('.solution-other').classList.toggle('hidden', c.solution !== 'Otro...');
-
-        wrapper.querySelector('.ctrl').value = c.ctrl;
-        wrapper.querySelector('.cumple').value = c.cumple;
-        wrapper.querySelector('.riesgo').value = c.riesgo;
+        wrapper.querySelector('.solution-other').classList.toggle('hidden', c.solution !== '10');
+        wrapper.querySelector('.ctrl').value     = c.ctrl;
+        wrapper.querySelector('.cumple').value   = c.cumple;
+        wrapper.querySelector('.riesgo').value   = c.riesgo;
         wrapper.querySelector('.evidencia').value = c.evidencia;
       });
-
       updateAll();
     }
 
     function getLatestReportKey() {
       const keys = Object.keys(localStorage).filter(k => k.startsWith('auditnist_'));
-      return keys.sort((a, b) => b.localeCompare(a))[0] || null;
+      return keys.sort((a,b) => b.localeCompare(a))[0] || null;
     }
 
     function listSavedReports() {
       const container = document.getElementById('saved-reports');
       const keys = Object.keys(localStorage)
         .filter(k => k.startsWith('auditnist_'))
-        .map(k => k.replace('auditnist_', ''));
-
-      if (keys.length === 0) {
-        container.innerHTML = '<em>No hay informes guardados aún.</em>';
-        return;
-      }
-
+        .map(k => k.replace('auditnist_',''));
+      if (keys.length === 0) { container.innerHTML = `<em>${T('no_reports_yet')}</em>`; return; }
       container.innerHTML = keys.map(id =>
         `<button onclick="loadProgress('${id}')"
-                 class="block px-3 py-1 bg-gray-600 text-white mb-2">${id}</button>`
-      ).join('');
+                 class="block px-3 py-1 bg-gray-600 text-white mb-2 rounded">${id}</button>`).join('');
     }
 
-    // --- Generar PDF ---
- function generatePDF() {
-  try {
-    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-    const data = {
-      empresa: document.getElementById('empresa_auditada').value,
-      auditora: document.getElementById('empresa_auditora').value,
-      auditor: document.getElementById('auditor').value,
-      alcance: document.getElementById('alcance').value,
-      id: document.getElementById('id_informe').value || 'sinID',
-      fecha: document.getElementById('fecha').value || new Date().toLocaleDateString()
-    };
+    // ── PDF ───────────────────────────────────────────────────────────────────
+    function generatePDF() {
+      try {
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const data = {
+          id:      document.getElementById('id_informe').value || 'sinID',
+          empresa: document.getElementById('empresa_auditada').value,
+          auditora:document.getElementById('empresa_auditora').value,
+          auditor: document.getElementById('auditor').value,
+          alcance: document.getElementById('alcance').value,
+          fecha:   document.getElementById('fecha').value || new Date().toLocaleDateString()
+        };
+        if (!data.empresa || !data.auditora) { alert(T('need_company_err')); return; }
 
-    if (!data.empresa || !data.auditora) {
-      alert('🛑 Debes completar Empresa auditada y Auditora antes de generar el PDF.');
-      return;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        doc.setFillColor(15,23,42); doc.rect(0,0,pageWidth,100,'F');
+        doc.setTextColor(56,189,248); doc.setFontSize(18).setFont(undefined,'bold');
+        doc.text(T('pdf_title'), 40, 100);
+        doc.setFontSize(11).setTextColor(0,0,0).setFont(undefined,'normal');
+
+        const labels = [T('pdf_report_id'), T('pdf_audited_company'), T('pdf_auditing_company'),
+                        T('pdf_auditor'), T('pdf_scope'), T('pdf_date')];
+        const vals   = [data.id, data.empresa, data.auditora, data.auditor, data.alcance, data.fecha];
+        labels.forEach((lbl,i) => doc.text(`${lbl}: ${vals[i]}`, 40, 120 + i * 14));
+
+        let y = 120 + 6 * 14 + 20;
+        doc.setFont(undefined,'bold').setFontSize(14);
+        doc.text(T('pdf_controls_heading'), 40, y); y += 20;
+        doc.setFont(undefined,'normal').setFontSize(11);
+
+        document.querySelectorAll('.control').forEach((blk, i) => {
+          const pVal = blk.querySelector('.problem').value;
+          const p = pVal === '10' ? blk.querySelector('.problem-other').value : (pVal ? T('prob_' + pVal) : '');
+          const sVal = blk.querySelector('.solution').value;
+          const s = sVal === '10' ? blk.querySelector('.solution-other').value : (sVal ? T('sol_' + sVal) : '');
+          const ctrl    = blk.querySelector('.ctrl').value;
+          const cumpleV = blk.querySelector('.cumple').value;
+          const cumple  = cumpleV ? T(cumpleV) : T('pdf_not_specified');
+          const riesgoV = blk.querySelector('.riesgo').value;
+          const riesgo  = riesgoV ? T(riesgoV) : T('pdf_not_specified');
+          const ev      = blk.querySelector('.evidencia').value || T('pdf_no_evidence');
+
+          if (y > 750) { doc.addPage(); y = 50; }
+          doc.setFont(undefined,'bold').setFontSize(12);
+          doc.text(`${T('pdf_control')} ${i+1}: ${ctrl}`, 40, y); y += 14;
+          doc.setFont(undefined,'normal');
+          doc.text(`• ${T('pdf_problem')}: ${p}`, 60, y); y += 12;
+          doc.text(`• ${T('pdf_solution')}: ${s}`, 60, y); y += 12;
+          doc.text(`• ${T('pdf_complies')}: ${cumple}`, 60, y); y += 12;
+          doc.text(`• ${T('pdf_risk')}: ${riesgo}`, 60, y); y += 12;
+          doc.text(`• ${T('pdf_evidence')}:`, 60, y); y += 10;
+          const lines = doc.splitTextToSize(ev, 480);
+          doc.text(lines, 70, y); y += lines.length * 12 + 20;
+        });
+
+        doc.save(`AuditNIST_Informe_${data.id}.pdf`);
+      } catch (e) {
+        console.error(e); alert(T('pdf_err') + e.message);
+      }
     }
 
-    // Portada
-    const pageWidth = doc.internal.pageSize.getWidth();
-    doc.setFillColor(15, 23, 42); // Fondo oscuro
-    doc.rect(0, 0, pageWidth, 100, 'F'); // Rectángulo de portada
-    doc.setTextColor(56, 189, 248); // Texto claro
-    doc.setFontSize(18).setFont(undefined, 'bold');
-    doc.text('Informe de Auditoría NIST CSF', 40, 100);
-
-    // Metadatos
-    doc.setFontSize(11).setTextColor(0,0,0); // Texto blanco
-    ['ID Informe','Empresa auditada','Empresa auditora','Auditor','Alcance','Fecha']
-      .forEach((label, i) => doc.text(`${label}: ${Object.values(data)[i]}`, 40, 120 + i * 14));
-
-    let y = 120 + 6 * 14 + 20;
-
-    // Controles
-    doc.setFont(undefined, 'bold').setFontSize(14);
-    doc.text("Controles Auditados", 40, y);
-    y += 20;
-
-    doc.setFont(undefined, 'normal').setFontSize(11);
-    document.querySelectorAll('.control').forEach((blk, i) => {
-      let p = blk.querySelector('.problem').value;
-      if (p === 'Otro...') p = blk.querySelector('.problem-other').value;
-
-      let s = blk.querySelector('.solution').value;
-      if (s === 'Otro...') s = blk.querySelector('.solution-other').value;
-
-      const ctrl = blk.querySelector('.ctrl').value;
-      const cumple = blk.querySelector('.cumple').value || 'No especificado';
-      const riesgo = blk.querySelector('.riesgo').value || 'No especificado';
-      const ev = blk.querySelector('.evidencia').value || '(Sin evidencia)';
-      
-      if (y > 750) { doc.addPage(); y = 50; }
-
-      doc.setFont(undefined, 'bold').setFontSize(12);
-      doc.text(`CONTROL ${i+1}: ${ctrl}`, 40, y);
-      y += 14;
-      doc.setFont(undefined, 'normal');
-      doc.text(`• Problemática: ${p}`, 60, y); y += 12;
-      doc.text(`• Solución: ${s}`, 60, y); y += 12;
-      doc.text(`• Cumple: ${cumple}`, 60, y); y += 12;
-      doc.text(`• Riesgo: ${riesgo}`, 60, y); y += 12;
-      doc.text(`• Evidencia:`, 60, y); y += 10;
-      const lines = doc.splitTextToSize(ev, 480);
-      doc.text(lines, 70, y);
-      y += lines.length * 12 + 20;
-    });
-
-    // Guardar
-    doc.save(`AuditNIST_Informe_${data.id}.pdf`);
-
-  } catch (e) {
-    console.error("Error al generar PDF:", e.message);
-    alert("⚠️ Error al generar PDF: " + e.message);
-  }
-}
-
-    // --- Exportar como TXT ---
+    // ── TXT export ────────────────────────────────────────────────────────────
     function exportToTXT() {
       const data = {
+        id:      document.getElementById('id_informe').value || 'sinID',
         empresa: document.getElementById('empresa_auditada').value,
-        auditora: document.getElementById('empresa_auditora').value,
+        auditora:document.getElementById('empresa_auditora').value,
         auditor: document.getElementById('auditor').value,
         alcance: document.getElementById('alcance').value,
-        id: document.getElementById('id_informe').value || 'sinID',
-        fecha: document.getElementById('fecha').value || new Date().toLocaleDateString(),
+        fecha:   document.getElementById('fecha').value || new Date().toLocaleDateString()
       };
+      let txt = `${T('pdf_title')}\n===========================\n\n`;
+      txt += `${T('pdf_report_id')}: ${data.id}\n`;
+      txt += `${T('pdf_audited_company')}: ${data.empresa}\n`;
+      txt += `${T('pdf_auditing_company')}: ${data.auditora}\n`;
+      txt += `${T('pdf_auditor')}: ${data.auditor}\n`;
+      txt += `${T('pdf_scope')}: ${data.alcance}\n`;
+      txt += `${T('pdf_date')}: ${data.fecha}\n\n`;
+      txt += `${T('txt_controls_heading')}\n`;
 
-      let txt = `Informe de Auditoría NIST CSF\n`;
-      txt += `===========================\n\n`;
-
-      txt += `ID del informe: ${data.id}\n`;
-      txt += `Empresa auditada: ${data.empresa}\n`;
-      txt += `Empresa auditora: ${data.auditora}\n`;
-      txt += `Auditor: ${data.auditor}\n`;
-      txt += `Alcance: ${data.alcance}\n`;
-      txt += `Fecha: ${data.fecha}\n\n`;
-
-      txt += `Controles Auditados:\n`;
       document.querySelectorAll('.control').forEach((blk, i) => {
-        let p = blk.querySelector('.problem').value;
-        if (p === 'Otro...') p = blk.querySelector('.problem-other').value;
-
-        let s = blk.querySelector('.solution').value;
-        if (s === 'Otro...') s = blk.querySelector('.solution-other').value;
-
-        const ctrl = blk.querySelector('.ctrl').value;
-        const cumple = blk.querySelector('.cumple').value || 'No especificado';
-        const riesgo = blk.querySelector('.riesgo').value || 'No especificado';
-        const ev = blk.querySelector('.evidencia').value;
-
-        txt += `\nControl: ${ctrl}\n`;
-        txt += `• Problemática: ${p}\n`;
-        txt += `• Solución: ${s}\n`;
-        txt += `• Cumple: ${cumple}\n`;
-        txt += `• Riesgo: ${riesgo}\n`;
-        txt += `• Evidencia: ${ev}\n`;
+        const pVal = blk.querySelector('.problem').value;
+        const p = pVal === '10' ? blk.querySelector('.problem-other').value : (pVal ? T('prob_' + pVal) : '');
+        const sVal = blk.querySelector('.solution').value;
+        const s = sVal === '10' ? blk.querySelector('.solution-other').value : (sVal ? T('sol_' + sVal) : '');
+        const ctrl    = blk.querySelector('.ctrl').value;
+        const cumpleV = blk.querySelector('.cumple').value;
+        const riesgoV = blk.querySelector('.riesgo').value;
+        const ev      = blk.querySelector('.evidencia').value;
+        txt += `\n${T('control_label')}: ${ctrl}\n`;
+        txt += `• ${T('pdf_problem')}: ${p}\n`;
+        txt += `• ${T('pdf_solution')}: ${s}\n`;
+        txt += `• ${T('pdf_complies')}: ${cumpleV ? T(cumpleV) : ''}\n`;
+        txt += `• ${T('pdf_risk')}: ${riesgoV ? T(riesgoV) : ''}\n`;
+        txt += `• ${T('pdf_evidence')}: ${ev}\n`;
       });
 
       const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
       saveAs(blob, `AuditNIST_Informe_${data.id}.txt`);
     }
 
-    // --- Inicialización ---
+    // ── Init ──────────────────────────────────────────────────────────────────
     window.onload = () => {
       initCharts();
+      const saved = localStorage.getItem('auditnist_lang') || 'es';
+      currentLang = saved;
+      document.getElementById('lang-select').value = saved;
+      setLanguage(saved);
       addControl();
     };
   </script>
-
-  <!-- Botones adicionales -->
-  <div class="container mx-auto mt-6">
-    <div class="flex flex-wrap gap-4">
-      <button onclick="saveProgress()" class="px-4 py-2 bg-cyberwarn text-black rounded hover:bg-yellow-500">
-        💾 Guardar Progreso
-      </button>
-      <button onclick="listSavedReports()" class="px-4 py-2 bg-cyberaccent text-black rounded hover:bg-blue-400">
-        📋 Ver Informes Guardados
-      </button>
-      <button onclick="exportToTXT()" class="px-4 py-2 bg-cyberok text-black rounded hover:bg-green-400">
-        📄 Exportar como .txt
-      </button>
-    </div>
-    <div id="saved-reports" class="mt-4 space-y-2"></div>
-  </div>
 </body>
 </html>

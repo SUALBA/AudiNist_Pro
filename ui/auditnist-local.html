@@ -165,8 +165,17 @@
     <div id="saved-reports" class="mt-4 space-y-2"></div>
   </div>
 
-  <script>
+<script type="module">
+
+
+  import { RiskEngine } from "../core/riskEngine.js"; 
+  import { AuditEngine } from "../core/auditEngine.js";
+
+
     const { jsPDF } = window.jspdf;
+    const auditEngine = new AuditEngine();
+
+
     // ── AI CONFIGURATION LAYER ─────────────────────────
     const AI_CONFIG = {
       provider: 'local',   // 'local' | 'openai' (futuro)
@@ -788,16 +797,30 @@ ${prompt}
     }
 
     // ── Summary & charts update ───────────────────────────────────────────────
-    function updateSummary() {
-      const cnt  = document.querySelectorAll('.control').length;
-      const ok   = [...document.querySelectorAll('.cumple')].filter(c => c.value === 'yes').length;
-      const no   = [...document.querySelectorAll('.cumple')].filter(c => c.value === 'no').length;
-      const alto = [...document.querySelectorAll('.riesgo')].filter(r => r.value === 'high').length;
-      document.getElementById('countTotal').textContent = `${T('total_controls')}: ${cnt}`;
-      document.getElementById('countOK').textContent    = `${T('compliant')}: ${ok}`;
-      document.getElementById('countFail').textContent  = `${T('non_compliant')}: ${no}`;
-      document.getElementById('countRisk').textContent  = `${T('high_risks')}: ${alto}`;
-    }
+  function updateSummary() {
+
+    const controls = [...document.querySelectorAll('.control')].map(ctrl => {
+      return {
+        compliance: ctrl.querySelector('.cumple')?.value || ''
+      };
+    });
+
+    auditEngine.loadControls(controls);
+
+  const summary = auditEngine.getSummary();
+
+    document.getElementById('countTotal').textContent =
+      `${T('total_controls')}: ${summary.total}`;
+
+    document.getElementById('countOK').textContent =
+      `${T('compliant')}: ${summary.compliant}`;
+
+    document.getElementById('countFail').textContent =
+      `${T('non_compliant')}: ${summary.nonCompliant}`;
+
+    document.getElementById('countRisk').textContent =
+      `${T('high_risks')}: ${summary.high}`;
+  } 
 
     function updateCharts() {
       if (!chartComp || !chartRisk) return;
@@ -996,14 +1019,28 @@ ${prompt}
     }
 
     // ── Init ──────────────────────────────────────────────────────────────────
-    window.onload = () => {
-      initCharts();
-      const saved = localStorage.getItem('auditnist_lang') || 'es';
-      currentLang = saved;
-      document.getElementById('lang-select').value = saved;
-      setLanguage(saved);
-      addControl();
-    };
+ 
+
+window.saveProgress = saveProgress;
+window.clearData = clearData;
+window.addControl = addControl;
+window.updateAll = updateAll;
+window.setLanguage = setLanguage;
+window.suggestControls = suggestControls;
+window.autoFillEvidence = autoFillEvidence;
+window.loadProgress = loadProgress;
+window.listSavedReports = listSavedReports;
+window.exportToTXT = exportToTXT;
+window.generatePDF = generatePDF;
+
+document.addEventListener('DOMContentLoaded', () => {
+  initCharts();
+
+  const savedLang = localStorage.getItem('auditnist_lang') || 'es';
+  setLanguage(savedLang);
+
+  addControl();
+});
   </script>
 </body>
 </html>

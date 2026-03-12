@@ -1,0 +1,28 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Node
+node_modules/
+dist/
+build/
+
+# Python
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
+
+# IntelliJ
+.idea/
+
+# Local environment
+.env
+.env.local
+
+# Ollama cache (if local artifacts appear)
+*.bin

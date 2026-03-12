@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AuditEngine Architecture Dashboard</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Segoe UI, sans-serif;
+background:#0f172a;
+color:#e2e8f0;
+display:flex;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:260px;
+background:#020617;
+padding:30px;
+height:100vh;
+position:fixed;
+}
+
+.sidebar h2{
+color:#38bdf8;
+font-size:20px;
+margin-bottom:20px;
+}
+
+.sidebar a{
+display:block;
+color:#94a3b8;
+text-decoration:none;
+margin:10px 0;
+font-size:15px;
+}
+
+.sidebar a:hover{
+color:white;
+}
+
+/* CONTENT */
+
+.content{
+margin-left:300px;
+padding:40px;
+max-width:1100px;
+}
+
+h1{
+font-size:34px;
+margin-bottom:10px;
+}
+
+h2{
+margin-top:50px;
+color:#38bdf8;
+}
+
+.card{
+background:#1e293b;
+padding:25px;
+border-radius:10px;
+margin-top:20px;
+}
+
+code{
+background:#020617;
+padding:4px 6px;
+border-radius:4px;
+}
+
+pre{
+background:#020617;
+padding:20px;
+border-radius:10px;
+overflow:auto;
+}
+
+.diagram{
+background:#020617;
+padding:30px;
+border-radius:10px;
+font-family:monospace;
+}
+.architecture{
+margin-top:30px;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:15px;
+}
+
+.layer{
+display:flex;
+gap:20px;
+justify-content:center;
+flex-wrap:wrap;
+}
+
+.box{
+background:#1e293b;
+padding:18px 24px;
+border-radius:10px;
+border:1px solid #334155;
+text-align:center;
+min-width:180px;
+font-weight:600;
+}
+
+.box span{
+display:block;
+font-size:13px;
+color:#94a3b8;
+margin-top:5px;
+}
+
+.arrow{
+font-size:22px;
+color:#38bdf8;
+}
+
+.ui{
+border:1px solid #22c55e;
+}
+
+.core{
+border:1px solid #38bdf8;
+}
+
+.framework{
+border:1px solid #f59e0b;
+}
+
+.data{
+border:1px solid #a78bfa;
+}
+
+.flow{
+display:flex;
+align-items:center;
+flex-wrap:wrap;
+gap:10px;
+margin-top:20px;
+}
+
+.flowbox{
+background:#1e293b;
+padding:14px 20px;
+border-radius:8px;
+border:1px solid #334155;
+}
+
+.flowarrow{
+font-size:20px;
+color:#38bdf8;
+}
+
+.timeline{
+display:flex;
+flex-direction:column;
+gap:25px;
+margin-top:20px;
+}
+
+.milestone{
+background:#1e293b;
+padding:20px;
+border-radius:10px;
+border-left:4px solid #38bdf8;
+}
+
+.milestone h3{
+margin-top:0;
+color:#38bdf8;
+}
+
+.milestone ul{
+margin:10px 0 0 20px;
+}
+
+.milestone li{
+margin-bottom:5px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>AuditEngine</h2>
+
+<a href="#vision">Vision</a>
+<a href="#architecture">Architecture</a>
+<a href="#structure">Project Structure</a>
+<a href="#data">Data Model</a>
+<a href="#flow">Execution Flow</a>
+<a href="#api">Engine API</a>
+<a href="#roadmap">Roadmap</a>
+
+</div>
+
+
+<div class="content">
+
+<h1>AuditEngine Core v1</h1>
+
+<p>
+Architecture dashboard for the AuditNIST Pro project.
+</p>
+
+<div class="card" id="vision">
+
+<h2>Vision</h2>
+
+<p>
+
+AuditEngine is a lightweight cybersecurity audit engine designed to transform complex frameworks into practical evaluation workflows.
+
+Instead of navigating large framework documentation, auditors can review structured controls and record their assessment in a consistent way.
+
+</p>
+
+</div>
+
+<div class="card" id="architecture">
+
+<div class="card" id="architecture">
+
+<h2>System Architecture</h2>
+
+<div class="architecture">
+
+<div class="layer">
+
+<div class="box ui">
+UI Layer
+<br>
+<span>auditnist-local.html</span>
+</div>
+
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="layer">
+
+<div class="box core">
+AuditEngine Core
+<br>
+<span>auditEngine.js</span>
+</div>
+
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="layer">
+
+<div class="box">
+Evaluation Manager
+</div>
+
+<div class="box">
+Risk Engine
+</div>
+
+<div class="box">
+Report Engine
+</div>
+
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="layer">
+
+<div class="box framework">
+Framework Adapters
+<br>
+<span>NIST / ISO / CIS</span>
+</div>
+
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="layer">
+
+<div class="box data">
+Framework Data
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="card" id="structure">
+
+<h2>Project Structure</h2>
+
+<pre>
+
+AuditNIST/
+
+core/
+   auditEngine.js
+   riskEngine.js
+   evaluationManager.js
+
+models/
+   control.js
+   auditSession.js
+   evaluation.js
+
+frameworks/
+   nistAdapter.js
+   iso27001Adapter.js
+
+ai/
+   aiProvider.js
+   ollamaProvider.js
+
+reporting/
+   reportEngine.js
+
+ui/
+   auditnist-local.html
+
+docs/
+   AuditEngine-Core-v1-Spec.md
+
+README.md
+
+</pre>
+
+</div>
+
+
+<div class="card" id="data">
+
+<h2>Data Model</h2>
+
+<p><b>Control</b></p>
+
+<pre>
+{
+ "id": "PR.AC-1",
+ "title": "Identity Management",
+ "framework": "NIST-CSF",
+ "category": "Protect"
+}
+</pre>
+
+<p><b>Evaluation</b></p>
+
+<pre>
+{
+ "control_id": "PR.AC-1",
+ "status": "Partial",
+ "notes": "Identity management incomplete",
+ "risk_score": "Medium"
+}
+</pre>
+
+<p><b>AuditSession</b></p>
+
+<pre>
+{
+ "company": "Example Org",
+ "framework": "NIST-CSF",
+ "auditor": "Susana",
+ "evaluations": []
+}
+</pre>
+
+</div>
+
+<div class="card" id="flow">
+
+<h2>Execution Flow</h2>
+
+<pre>
+
+User starts audit
+       ↓
+Framework adapter loads controls
+       ↓
+AuditEngine creates audit session
+       ↓
+User evaluates controls
+       ↓
+EvaluationManager records results
+       ↓
+RiskEngine calculates risk
+       ↓
+ReportEngine generates report
+
+</pre>
+
+</div>
+
+<div class="card" id="api">
+
+<h2>Engine API</h2>
+
+<pre>
+
+const engine = new AuditEngine(nistAdapter)
+
+engine.startAudit({
+ company: "Example Corp",
+ auditor: "Susana",
+ framework: "NIST"
+})
+
+engine.evaluateControl("PR.AC-1", {
+ status: "Partial",
+ notes: "Identity management incomplete"
+})
+
+engine.generateReport()
+
+</pre>
+
+</div>
+
+
+<div class="card" id="roadmap">
+
+<h2>Product Evolution Roadmap</h2>
+
+<div class="timeline">
+
+<div class="milestone">
+
+<h3>v0.1 — AuditNIST Prototype</h3>
+
+<ul>
+<li>NIST CSF checklist</li>
+<li>manual control evaluation</li>
+<li>basic audit summary</li>
+<li>local HTML interface</li>
+<li>experimental AI explanations</li>
+</ul>
+
+</div>
+
+
+<div class="milestone">
+
+<h3>v0.2 — AuditEngine Core</h3>
+
+<ul>
+<li>AuditEngine architecture</li>
+<li>control evaluation model</li>
+<li>risk calculation engine</li>
+<li>audit session management</li>
+<li>framework adapter system</li>
+</ul>
+
+</div>
+
+
+<div class="milestone">
+
+<h3>v0.3 — Multi-Framework Support</h3>
+
+<ul>
+<li>ISO 27001 adapter</li>
+<li>CIS Controls adapter</li>
+<li>framework abstraction layer</li>
+<li>improved reporting</li>
+<li>framework comparison capability</li>
+</ul>
+
+</div>
+
+
+<div class="milestone">
+
+<h3>v0.4 — Intelligent Audit Platform</h3>
+
+<ul>
+<li>AI remediation suggestions</li>
+<li>control explanation assistant</li>
+<li>risk analysis support</li>
+<li>audit dashboards</li>
+<li>exportable reports</li>
+</ul>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card" id="flow">
+
+<h2>Audit Workflow</h2>
+
+<div class="flow">
+
+<div class="flowbox">Start Audit</div>
+<div class="flowarrow">→</div>
+
+<div class="flowbox">Load Framework</div>
+<div class="flowarrow">→</div>
+
+<div class="flowbox">Evaluate Controls</div>
+<div class="flowarrow">→</div>
+
+<div class="flowbox">Risk Calculation</div>
+<div class="flowarrow">→</div>
+
+<div class="flowbox">Generate Report</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Engine Components</h2>
+
+<div class="architecture">
+
+<div class="layer">
+
+<div class="box core">
+AuditEngine
+</div>
+
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="layer">
+
+<div class="box">EvaluationManager</div>
+<div class="box">RiskEngine</div>
+<div class="box">ReportEngine</div>
+
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="layer">
+
+<div class="box framework">
+FrameworkAdapter
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card" id="frameworks">
+
+<h2>Framework Ecosystem</h2>
+
+<div class="layer">
+
+<div class="box framework">
+NIST CSF
+</div>
+
+<div class="box framework">
+ISO 27001
+</div>
+
+<div class="box framework">
+CIS Controls
+</div>
+
+<div class="box framework">
+Future Frameworks
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Product Evolution</h2>
+
+<div class="flow">
+
+<div class="flowbox">
+AuditNIST
+<br>
+<span>Initial prototype</span>
+</div>
+
+<div class="flowarrow">→</div>
+
+<div class="flowbox">
+AuditEngine Core
+<br>
+<span>Framework-agnostic engine</span>
+</div>
+
+<div class="flowarrow">→</div>
+
+<div class="flowbox">
+Audit Platform
+<br>
+<span>Multi-framework auditing</span>
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>

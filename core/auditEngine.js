@@ -1,7 +1,7 @@
 import { RiskEngine } from "./riskEngine.js";
 
-import { NistAdapter } from "../frameworks/nistAdapter.js";
-import { IsoAdapter } from "../frameworks/isoAdapter.js";
+import { NistAdapter } from "../frameworks/nist-csfAdapter.js";
+import { IsoAdapter } from "../frameworks/iso27001Adapter.js";
 import { CisAdapter } from "../frameworks/cisAdapter.js";
 import { CobitAdapter } from "../frameworks/cobitAdapter.js";
 

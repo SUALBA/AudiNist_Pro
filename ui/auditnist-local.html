@@ -43,6 +43,15 @@
               data-i18n="clear_data">Limpiar datos</button>
     </div>
   </header>
+<label class="text-sm text-gray-300 mr-2">Framework:</label>
+<select id="framework-select"
+        class="bg-cyberpanel text-white border border-cyberaccent px-3 py-1 rounded">
+  <option value="nist-csf">NIST CSF 2.0</option>
+  <option value="iso27001">ISO 27001</option>
+  <option value="cis">CIS Controls v8</option>
+  <option value="cobit">COBIT 2019</option>
+</select>
+
 
   <!-- Suggest Controls -->
   <section class="container mx-auto mt-4 bg-cyberpanel p-4 rounded-lg shadow-lg">
@@ -170,10 +179,20 @@
 
   import { RiskEngine } from "../core/riskEngine.js"; 
   import { AuditEngine } from "../core/auditEngine.js";
+  
 
 
     const { jsPDF } = window.jspdf;
     const auditEngine = new AuditEngine();
+
+  const frameworkSelect = document.getElementById("framework-select");
+
+if (frameworkSelect) {
+  frameworkSelect.addEventListener("change", (e) => {
+    auditEngine.setFramework(e.target.value);
+    updateFrameworkUI();
+  });
+}
 
 
     // ── AI CONFIGURATION LAYER ─────────────────────────
@@ -662,28 +681,35 @@ ${prompt}
       }
     }
 
-    async function suggestControls() {
-      const btn = document.getElementById('suggest-controls');
-      btn.disabled = true;
-      document.getElementById('suggest-status').textContent = T('generating');
-      try {
-        const fn = document.getElementById('nist-function').value;
-        const prompt = `List 5 NIST CSF controls (code + name) for the "${fn}" function. Return ONLY a valid JSON array:\n[{"code":"PR.AC-1","name":"Access Control Policy"},...]\nNo extra text.`;
-       const aiText = await generateAI(prompt);
-        const match = aiText.replace(/^[^\[{]*/,'').match(/\[[\s\S]*\]/);
-        if (!match) throw new Error('Invalid JSON');
-        const list = JSON.parse(match[0]);
-        document.getElementById('suggested-controls').innerHTML =
-          list.map(c => `<button onclick="addSuggestedControl('${c.code} – ${c.name}')"
-            class="px-3 py-1 bg-gray-600 text-white rounded">${c.code}</button>`).join('');
-      } catch (e) {
-        alert(T('err_suggestions') + e.message);
-      } finally {
-        document.getElementById('suggest-status').textContent = '';
-        btn.disabled = false;
-      }
-    }
+   async function suggestControls() {
 
+  const btn = document.getElementById('suggest-controls');
+  btn.disabled = true;
+  document.getElementById('suggest-status').textContent = T('generating');
+
+  try {
+
+    const adapter = auditEngine.getAdapter();
+    const domain = document.getElementById('nist-function').value;
+
+    // 🔥 Ahora usamos el adapter, no la IA
+    const controls = adapter.getControlsByDomain(domain);
+
+    document.getElementById('suggested-controls').innerHTML =
+      controls.map(c =>
+        `<button onclick="addSuggestedControl('${c.code} – ${c.name}')"
+         class="px-3 py-1 bg-gray-600 text-white rounded">
+         ${c.code}
+         </button>`
+      ).join('');
+
+  } catch (e) {
+    alert(T('err_suggestions') + e.message);
+  } finally {
+    document.getElementById('suggest-status').textContent = '';
+    btn.disabled = false;
+  }
+}
     function addSuggestedControl(text) {
       addControl();
       const ctrls = document.querySelectorAll('.ctrl');
@@ -1018,6 +1044,33 @@ ${prompt}
       saveAs(blob, `AuditNIST_Informe_${data.id}.txt`);
     }
 
+
+
+function updateFrameworkUI() {
+  const adapter = auditEngine.getAdapter();
+  const categories = adapter.getCategories();
+
+  const categorySelect = document.getElementById("nist-function");
+  if (!categorySelect) return;
+
+  categorySelect.innerHTML = "";
+
+  categories.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    categorySelect.appendChild(opt);
+  });
+
+  // actualizar placeholder de control ID
+  const placeholder = adapter.getControlPlaceholder();
+  document.querySelectorAll(".ctrl").forEach(input => {
+    input.placeholder = placeholder;
+  });
+
+  }
+
+  updateFrameworkUI();
     // ── Init ──────────────────────────────────────────────────────────────────
  
 

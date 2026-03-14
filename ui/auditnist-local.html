@@ -174,12 +174,377 @@
     <div id="saved-reports" class="mt-4 space-y-2"></div>
   </div>
 
-<script type="module">
+<script>
 
+  // ── Inlined classes (standalone — works with file:// and http://) ────────────
 
-  import { RiskEngine } from "../core/riskEngine.js"; 
-  import { AuditEngine } from "../core/auditEngine.js";
-  
+  class RiskEngine {
+    static calculateSummary(controls = []) {
+      const summary = { total: 0, compliant: 0, nonCompliant: 0, partial: 0, high: 0, medium: 0, low: 0 };
+      summary.total = controls.length;
+      controls.forEach(ctrl => {
+        switch (ctrl.compliance) {
+          case 'yes':   summary.compliant++;   if (ctrl.risk === 'low') summary.low++; break;
+          case 'no':    summary.nonCompliant++; summary.high++;   break;
+          case 'partial': summary.partial++;   summary.medium++; break;
+        }
+      });
+      return summary;
+    }
+  }
+
+  class NistAdapter {
+    constructor() {
+      this.key = "nist-csf";
+      this.name = "NIST CSF 2.0";
+      this.domains = {
+        "Identify": [
+          { code: "ID.AM-1", name: "Physical devices and systems inventoried" },
+          { code: "ID.GV-1", name: "Cybersecurity policy established" }
+        ],
+        "Protect": [
+          { code: "PR.AC-1", name: "Access control policy and procedures" },
+          { code: "PR.DS-1", name: "Data at rest protected" }
+        ],
+        "Detect": [
+          { code: "DE.CM-1", name: "Network monitoring performed" },
+          { code: "DE.AE-1", name: "Anomalies detected and analyzed" }
+        ],
+        "Respond": [
+          { code: "RS.RP-1", name: "Response plan executed" },
+          { code: "RS.CO-1", name: "Response coordinated with stakeholders" }
+        ],
+        "Recover": [
+          { code: "RC.RP-1", name: "Recovery plan executed" },
+          { code: "RC.IM-1", name: "Recovery improvements implemented" }
+        ]
+      };
+    }
+    getKey()                    { return this.key; }
+    getName()                   { return this.name; }
+    getCategories()             { return Object.keys(this.domains); }
+    getControlsByDomain(domain) { return this.domains[domain] || []; }
+    getControlPlaceholder()     { return "PR.AC-1"; }
+    getAIContext()              { return "NIST Cybersecurity Framework 2.0"; }
+  }
+
+  class IsoAdapter {
+    constructor() {
+      this.key = "iso27001";
+      this.name = "ISO 27001:2022";
+      this.domains = {
+        "Organizational": [
+          { code: "A.5.1",  name: "Policies for information security" },
+          { code: "A.5.2",  name: "Information security roles and responsibilities" },
+          { code: "A.5.3",  name: "Segregation of duties" },
+          { code: "A.5.4",  name: "Management responsibilities" },
+          { code: "A.5.5",  name: "Contact with authorities" },
+          { code: "A.5.6",  name: "Contact with special interest groups" },
+          { code: "A.5.7",  name: "Threat intelligence" },
+          { code: "A.5.8",  name: "Information security in project management" },
+          { code: "A.5.9",  name: "Inventory of information and other associated assets" },
+          { code: "A.5.10", name: "Acceptable use of information and other associated assets" },
+          { code: "A.5.11", name: "Return of assets" },
+          { code: "A.5.12", name: "Classification of information" },
+          { code: "A.5.13", name: "Labelling of information" },
+          { code: "A.5.14", name: "Information transfer" },
+          { code: "A.5.15", name: "Access control" },
+          { code: "A.5.16", name: "Identity management" },
+          { code: "A.5.17", name: "Authentication information" },
+          { code: "A.5.18", name: "Access rights" },
+          { code: "A.5.19", name: "Information security in supplier relationships" },
+          { code: "A.5.20", name: "Addressing information security within supplier agreements" },
+          { code: "A.5.21", name: "Managing information security in the ICT supply chain" },
+          { code: "A.5.22", name: "Monitoring, review and change management of supplier services" },
+          { code: "A.5.23", name: "Information security for use of cloud services" },
+          { code: "A.5.24", name: "Information security incident management planning and preparation" },
+          { code: "A.5.25", name: "Assessment and decision on information security events" },
+          { code: "A.5.26", name: "Response to information security incidents" },
+          { code: "A.5.27", name: "Learning from information security incidents" },
+          { code: "A.5.28", name: "Collection of evidence" },
+          { code: "A.5.29", name: "Information security during disruption" },
+          { code: "A.5.30", name: "ICT readiness for business continuity" },
+          { code: "A.5.31", name: "Legal, statutory, regulatory and contractual requirements" },
+          { code: "A.5.32", name: "Intellectual property rights" },
+          { code: "A.5.33", name: "Protection of records" },
+          { code: "A.5.34", name: "Privacy and protection of personal identifiable information" },
+          { code: "A.5.35", name: "Independent review of information security" },
+          { code: "A.5.36", name: "Compliance with policies, rules and standards for information security" },
+          { code: "A.5.37", name: "Documented operating procedures" }
+        ],
+        "People": [
+          { code: "A.6.1", name: "Screening" },
+          { code: "A.6.2", name: "Terms and conditions of employment" },
+          { code: "A.6.3", name: "Information security awareness, education and training" },
+          { code: "A.6.4", name: "Disciplinary process" },
+          { code: "A.6.5", name: "Responsibilities after termination or change of employment" },
+          { code: "A.6.6", name: "Confidentiality or non-disclosure agreements" },
+          { code: "A.6.7", name: "Remote working" },
+          { code: "A.6.8", name: "Information security event reporting" }
+        ],
+        "Physical": [
+          { code: "A.7.1",  name: "Physical security perimeters" },
+          { code: "A.7.2",  name: "Physical entry" },
+          { code: "A.7.3",  name: "Securing offices, rooms and facilities" },
+          { code: "A.7.4",  name: "Physical security monitoring" },
+          { code: "A.7.5",  name: "Protecting against physical and environmental threats" },
+          { code: "A.7.6",  name: "Working in secure areas" },
+          { code: "A.7.7",  name: "Clear desk and clear screen" },
+          { code: "A.7.8",  name: "Equipment siting and protection" },
+          { code: "A.7.9",  name: "Security of assets off-premises" },
+          { code: "A.7.10", name: "Storage media" },
+          { code: "A.7.11", name: "Supporting utilities" },
+          { code: "A.7.12", name: "Cabling security" },
+          { code: "A.7.13", name: "Equipment maintenance" },
+          { code: "A.7.14", name: "Secure disposal or re-use of equipment" }
+        ],
+        "Technological": [
+          { code: "A.8.1",  name: "User endpoint devices" },
+          { code: "A.8.2",  name: "Privileged access rights" },
+          { code: "A.8.3",  name: "Information access restriction" },
+          { code: "A.8.4",  name: "Access to source code" },
+          { code: "A.8.5",  name: "Secure authentication" },
+          { code: "A.8.6",  name: "Capacity management" },
+          { code: "A.8.7",  name: "Protection against malware" },
+          { code: "A.8.8",  name: "Management of technical vulnerabilities" },
+          { code: "A.8.9",  name: "Configuration management" },
+          { code: "A.8.10", name: "Information deletion" },
+          { code: "A.8.11", name: "Data masking" },
+          { code: "A.8.12", name: "Data leakage prevention" },
+          { code: "A.8.13", name: "Information backup" },
+          { code: "A.8.14", name: "Redundancy of information processing facilities" },
+          { code: "A.8.15", name: "Logging" },
+          { code: "A.8.16", name: "Monitoring activities" },
+          { code: "A.8.17", name: "Clock synchronization" },
+          { code: "A.8.18", name: "Use of privileged utility programs" },
+          { code: "A.8.19", name: "Installation of software on operational systems" },
+          { code: "A.8.20", name: "Networks security" },
+          { code: "A.8.21", name: "Security of network services" },
+          { code: "A.8.22", name: "Segregation of networks" },
+          { code: "A.8.23", name: "Web filtering" },
+          { code: "A.8.24", name: "Use of cryptography" },
+          { code: "A.8.25", name: "Secure development life cycle" },
+          { code: "A.8.26", name: "Application security requirements" },
+          { code: "A.8.27", name: "Secure system architecture and engineering principles" },
+          { code: "A.8.28", name: "Secure coding" },
+          { code: "A.8.29", name: "Security testing in development and acceptance" },
+          { code: "A.8.30", name: "Outsourced development" },
+          { code: "A.8.31", name: "Separation of development, test and production environments" },
+          { code: "A.8.32", name: "Change management" },
+          { code: "A.8.33", name: "Test information" },
+          { code: "A.8.34", name: "Protection of information systems during audit testing" }
+        ]
+      };
+    }
+    getKey()                    { return this.key; }
+    getName()                   { return this.name; }
+    getCategories()             { return Object.keys(this.domains); }
+    getControlsByDomain(domain) { return this.domains[domain] || []; }
+    getControlPlaceholder()     { return "A.5.1"; }
+    getAIContext()              { return "ISO 27001:2022 Annex A controls"; }
+  }
+
+  class CisAdapter {
+    constructor() {
+      this.key = "cis";
+      this.name = "CIS Controls v8";
+      this.domains = {
+        "IG1 \u2013 Basic": [
+          { code: "CIS 1.1",  name: "Establish and maintain detailed enterprise asset inventory" },
+          { code: "CIS 1.2",  name: "Address unauthorized assets" },
+          { code: "CIS 2.1",  name: "Establish and maintain a software inventory" },
+          { code: "CIS 2.2",  name: "Ensure authorized software is currently supported" },
+          { code: "CIS 2.3",  name: "Address unauthorized software" },
+          { code: "CIS 3.3",  name: "Configure data access control lists" },
+          { code: "CIS 4.1",  name: "Establish and maintain a secure configuration process" },
+          { code: "CIS 4.2",  name: "Establish and maintain a secure configuration process for network infrastructure" },
+          { code: "CIS 5.1",  name: "Establish and maintain an inventory of accounts" },
+          { code: "CIS 5.2",  name: "Use unique passwords" },
+          { code: "CIS 5.3",  name: "Disable dormant accounts" },
+          { code: "CIS 5.4",  name: "Restrict administrator privileges to dedicated administrator accounts" },
+          { code: "CIS 6.1",  name: "Establish an access granting process" },
+          { code: "CIS 6.2",  name: "Establish an access revoking process" },
+          { code: "CIS 7.3",  name: "Perform automated operating system patch management" },
+          { code: "CIS 7.4",  name: "Perform automated application patch management" },
+          { code: "CIS 8.2",  name: "Collect audit logs" },
+          { code: "CIS 9.1",  name: "Ensure use of only fully supported browsers and email clients" },
+          { code: "CIS 10.1", name: "Deploy and maintain anti-malware software" },
+          { code: "CIS 10.2", name: "Configure automatic anti-malware signature updates" },
+          { code: "CIS 11.1", name: "Establish and maintain a data recovery process" },
+          { code: "CIS 11.2", name: "Perform automated backups" },
+          { code: "CIS 14.1", name: "Establish and maintain a security awareness program" },
+          { code: "CIS 14.2", name: "Train workforce members to recognize social engineering attacks" }
+        ],
+        "IG2 \u2013 Foundational": [
+          { code: "CIS 1.3",  name: "Utilize an active discovery tool to identify assets" },
+          { code: "CIS 2.4",  name: "Utilize automated software inventory tools" },
+          { code: "CIS 3.1",  name: "Establish and maintain a data management process" },
+          { code: "CIS 3.2",  name: "Establish and maintain a data inventory" },
+          { code: "CIS 3.4",  name: "Enforce data retention" },
+          { code: "CIS 3.5",  name: "Securely dispose of data" },
+          { code: "CIS 4.3",  name: "Configure automatic session locking on enterprise assets" },
+          { code: "CIS 5.5",  name: "Establish and maintain an inventory of service accounts" },
+          { code: "CIS 6.3",  name: "Require MFA for externally-exposed applications" },
+          { code: "CIS 6.4",  name: "Require MFA for remote network access" },
+          { code: "CIS 7.1",  name: "Establish and maintain a vulnerability management process" },
+          { code: "CIS 7.2",  name: "Establish and maintain a remediation process" },
+          { code: "CIS 7.5",  name: "Perform automated vulnerability scans of internal enterprise assets" },
+          { code: "CIS 8.1",  name: "Establish and maintain an audit log management process" },
+          { code: "CIS 8.3",  name: "Ensure adequate audit log storage" },
+          { code: "CIS 8.4",  name: "Standardize time synchronization" },
+          { code: "CIS 9.2",  name: "Use DNS filtering services" },
+          { code: "CIS 9.3",  name: "Maintain and enforce network-based URL filters" },
+          { code: "CIS 10.3", name: "Disable autorun and autoplay for removable media" },
+          { code: "CIS 11.3", name: "Protect recovery data" },
+          { code: "CIS 11.4", name: "Establish and maintain an isolated instance of recovery data" },
+          { code: "CIS 12.1", name: "Ensure network infrastructure is up-to-date" },
+          { code: "CIS 12.2", name: "Establish and maintain a secure network architecture" },
+          { code: "CIS 12.3", name: "Securely manage network infrastructure" },
+          { code: "CIS 13.1", name: "Centralize security event alerting" },
+          { code: "CIS 13.2", name: "Deploy a host-based intrusion detection solution" },
+          { code: "CIS 14.3", name: "Train workforce members on authentication best practices" },
+          { code: "CIS 14.4", name: "Train workforce on data handling best practices" },
+          { code: "CIS 15.1", name: "Establish and maintain an inventory of service providers" },
+          { code: "CIS 15.2", name: "Establish and maintain a service provider management policy" },
+          { code: "CIS 16.1", name: "Establish and maintain a secure application development process" },
+          { code: "CIS 16.2", name: "Establish and maintain a process to accept and address software vulnerabilities" },
+          { code: "CIS 17.1", name: "Designate personnel to manage incident handling" },
+          { code: "CIS 17.2", name: "Establish and maintain contact information for reporting incidents" }
+        ],
+        "IG3 \u2013 Organizational": [
+          { code: "CIS 3.6",  name: "Encrypt data on end-user devices" },
+          { code: "CIS 3.7",  name: "Establish and maintain a data classification scheme" },
+          { code: "CIS 3.12", name: "Segment data processing and storage based on sensitivity" },
+          { code: "CIS 3.13", name: "Deploy a data loss prevention solution" },
+          { code: "CIS 3.14", name: "Log sensitive data access" },
+          { code: "CIS 6.5",  name: "Require MFA for administrative access" },
+          { code: "CIS 6.6",  name: "Establish and maintain an inventory of authentication and authorization systems" },
+          { code: "CIS 6.7",  name: "Centralize access control" },
+          { code: "CIS 7.6",  name: "Perform automated vulnerability scans of externally-exposed enterprise assets" },
+          { code: "CIS 7.7",  name: "Remediate detected vulnerabilities" },
+          { code: "CIS 8.9",  name: "Centralize audit logs" },
+          { code: "CIS 8.10", name: "Retain audit logs" },
+          { code: "CIS 8.11", name: "Conduct audit log reviews" },
+          { code: "CIS 8.12", name: "Collect service provider logs" },
+          { code: "CIS 9.4",  name: "Restrict unnecessary or unauthorized browser and email client extensions" },
+          { code: "CIS 9.5",  name: "Implement DMARC" },
+          { code: "CIS 10.4", name: "Configure anti-malware scanning of removable media" },
+          { code: "CIS 13.4", name: "Perform traffic filtering between network segments" },
+          { code: "CIS 13.5", name: "Manage access control for remote assets" },
+          { code: "CIS 13.6", name: "Collect network traffic flow logs" },
+          { code: "CIS 13.7", name: "Deploy a host-based intrusion prevention solution" },
+          { code: "CIS 14.6", name: "Train workforce on recognizing and reporting security incidents" },
+          { code: "CIS 14.8", name: "Train workforce on identifying and reporting missing security updates" },
+          { code: "CIS 15.4", name: "Ensure service provider contracts include security requirements" },
+          { code: "CIS 15.5", name: "Assess service providers" },
+          { code: "CIS 16.3", name: "Perform root cause analysis on security vulnerabilities" },
+          { code: "CIS 16.6", name: "Use up-to-date and trusted third-party software components" },
+          { code: "CIS 16.7", name: "Use standard hardening configuration templates for application infrastructure" },
+          { code: "CIS 16.9", name: "Train developers in application security concepts and secure coding" },
+          { code: "CIS 17.4", name: "Establish and maintain an incident response process" },
+          { code: "CIS 17.5", name: "Assign key roles and responsibilities for incident response" },
+          { code: "CIS 17.7", name: "Conduct routine incident response exercises" },
+          { code: "CIS 18.1", name: "Establish and maintain a penetration testing program" },
+          { code: "CIS 18.2", name: "Perform periodic external penetration tests" },
+          { code: "CIS 18.3", name: "Remediate penetration test findings" },
+          { code: "CIS 18.4", name: "Validate security measures" },
+          { code: "CIS 18.5", name: "Perform periodic internal penetration tests" }
+        ]
+      };
+    }
+    getKey()                    { return this.key; }
+    getName()                   { return this.name; }
+    getCategories()             { return Object.keys(this.domains); }
+    getControlsByDomain(domain) { return this.domains[domain] || []; }
+    getControlPlaceholder()     { return "CIS 1.1"; }
+    getAIContext()              { return "CIS Controls Version 8"; }
+  }
+
+  class CobitAdapter {
+    constructor() {
+      this.key = "cobit";
+      this.name = "COBIT 2019";
+      this.domains = {
+        "EDM": [
+          { code: "EDM01", name: "Ensure Governance Framework Setting and Maintenance" },
+          { code: "EDM02", name: "Ensure Benefits Delivery" },
+          { code: "EDM03", name: "Ensure Risk Optimization" },
+          { code: "EDM04", name: "Ensure Resource Optimization" },
+          { code: "EDM05", name: "Ensure Stakeholder Engagement" }
+        ],
+        "APO": [
+          { code: "APO01", name: "Manage the IT Management Framework" },
+          { code: "APO02", name: "Manage Strategy" },
+          { code: "APO03", name: "Manage Enterprise Architecture" },
+          { code: "APO04", name: "Manage Innovation" },
+          { code: "APO05", name: "Manage Portfolio" },
+          { code: "APO06", name: "Manage Budget and Costs" },
+          { code: "APO07", name: "Manage Human Resources" },
+          { code: "APO08", name: "Manage Relationships" },
+          { code: "APO09", name: "Manage Service Agreements" },
+          { code: "APO10", name: "Manage Vendors" },
+          { code: "APO11", name: "Manage Quality" },
+          { code: "APO12", name: "Manage Risk" },
+          { code: "APO13", name: "Manage Security" },
+          { code: "APO14", name: "Manage Data" }
+        ],
+        "BAI": [
+          { code: "BAI01", name: "Manage Programmes" },
+          { code: "BAI02", name: "Manage Requirements Definition" },
+          { code: "BAI03", name: "Manage Solutions Identification and Build" },
+          { code: "BAI04", name: "Manage Availability and Capacity" },
+          { code: "BAI05", name: "Manage Organizational Change" },
+          { code: "BAI06", name: "Manage IT Changes" },
+          { code: "BAI07", name: "Manage IT Change Acceptance and Transitioning" },
+          { code: "BAI08", name: "Manage Knowledge" },
+          { code: "BAI09", name: "Manage Assets" },
+          { code: "BAI10", name: "Manage Configuration" },
+          { code: "BAI11", name: "Manage Projects" }
+        ],
+        "DSS": [
+          { code: "DSS01", name: "Manage Operations" },
+          { code: "DSS02", name: "Manage Service Requests and Incidents" },
+          { code: "DSS03", name: "Manage Problems" },
+          { code: "DSS04", name: "Manage Continuity" },
+          { code: "DSS05", name: "Manage Security Services" },
+          { code: "DSS06", name: "Manage Business Process Controls" }
+        ],
+        "MEA": [
+          { code: "MEA01", name: "Manage Performance and Conformance Monitoring" },
+          { code: "MEA02", name: "Manage System of Internal Control" },
+          { code: "MEA03", name: "Manage Compliance with External Requirements" },
+          { code: "MEA04", name: "Manage Assurance" }
+        ]
+      };
+    }
+    getKey()                    { return this.key; }
+    getName()                   { return this.name; }
+    getCategories()             { return Object.keys(this.domains); }
+    getControlsByDomain(domain) { return this.domains[domain] || []; }
+    getControlPlaceholder()     { return "EDM01"; }
+    getAIContext()              { return "COBIT 2019 governance framework"; }
+  }
+
+  class AuditEngine {
+    constructor() {
+      this.controls = [];
+      this.adapters = {
+        "nist-csf": new NistAdapter(),
+        "iso27001":  new IsoAdapter(),
+        "cis":       new CisAdapter(),
+        "cobit":     new CobitAdapter()
+      };
+      this.frameworkKey = "nist-csf";
+    }
+    setFramework(key) { if (this.adapters[key]) this.frameworkKey = key; }
+    getAdapter()      { return this.adapters[this.frameworkKey]; }
+    loadControls(arr) { this.controls = arr; }
+    getSummary()      { return RiskEngine.calculateSummary(this.controls); }
+    reset()           { this.controls = []; }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+
 
 
     const { jsPDF } = window.jspdf;

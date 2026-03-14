@@ -191,6 +191,7 @@ if (frameworkSelect) {
   frameworkSelect.addEventListener("change", (e) => {
     auditEngine.setFramework(e.target.value);
     updateFrameworkUI();
+    localStorage.setItem('auditnist_framework', e.target.value);
   });
 }
 
@@ -873,13 +874,14 @@ ${prompt}
     // ── Save / Load ───────────────────────────────────────────────────────────
     function saveProgress() {
       const data = {
-        empresa:  document.getElementById('empresa_auditada').value,
-        auditora: document.getElementById('empresa_auditora').value,
-        auditor:  document.getElementById('auditor').value,
-        alcance:  document.getElementById('alcance').value,
-        id:       document.getElementById('id_informe').value || 'sinID',
-        fecha:    document.getElementById('fecha').value || new Date().toLocaleDateString(),
-        controls: []
+        empresa:   document.getElementById('empresa_auditada').value,
+        auditora:  document.getElementById('empresa_auditora').value,
+        auditor:   document.getElementById('auditor').value,
+        alcance:   document.getElementById('alcance').value,
+        id:        document.getElementById('id_informe').value || 'sinID',
+        fecha:     document.getElementById('fecha').value || new Date().toLocaleDateString(),
+        framework: auditEngine.frameworkKey,
+        controls:  []
       };
       document.querySelectorAll('.control').forEach(blk => {
         data.controls.push({
@@ -925,17 +927,22 @@ ${prompt}
         wrapper.querySelector('.evidencia').value = c.evidencia;
       });
       updateAll();
+      if (data.framework) {
+        auditEngine.setFramework(data.framework);
+        if (frameworkSelect) frameworkSelect.value = data.framework;
+        updateFrameworkUI();
+      }
     }
 
     function getLatestReportKey() {
-      const keys = Object.keys(localStorage).filter(k => k.startsWith('auditnist_'));
+      const keys = Object.keys(localStorage).filter(k => k.startsWith('auditnist_') && k !== 'auditnist_lang' && k !== 'auditnist_framework');
       return keys.sort((a,b) => b.localeCompare(a))[0] || null;
     }
 
     function listSavedReports() {
       const container = document.getElementById('saved-reports');
       const keys = Object.keys(localStorage)
-        .filter(k => k.startsWith('auditnist_'))
+        .filter(k => k.startsWith('auditnist_') && k !== 'auditnist_lang' && k !== 'auditnist_framework')
         .map(k => k.replace('auditnist_',''));
       if (keys.length === 0) { container.innerHTML = `<em>${T('no_reports_yet')}</em>`; return; }
       container.innerHTML = keys.map(id =>
@@ -964,11 +971,12 @@ ${prompt}
         doc.setFontSize(11).setTextColor(0,0,0).setFont(undefined,'normal');
 
         const labels = [T('pdf_report_id'), T('pdf_audited_company'), T('pdf_auditing_company'),
-                        T('pdf_auditor'), T('pdf_scope'), T('pdf_date')];
-        const vals   = [data.id, data.empresa, data.auditora, data.auditor, data.alcance, data.fecha];
+                        T('pdf_auditor'), T('pdf_scope'), T('pdf_date'), 'Framework'];
+        const vals   = [data.id, data.empresa, data.auditora, data.auditor, data.alcance, data.fecha,
+                        auditEngine.getAdapter().getName()];
         labels.forEach((lbl,i) => doc.text(`${lbl}: ${vals[i]}`, 40, 120 + i * 14));
 
-        let y = 120 + 6 * 14 + 20;
+        let y = 120 + 7 * 14 + 20;
         doc.setFont(undefined,'bold').setFontSize(14);
         doc.text(T('pdf_controls_heading'), 40, y); y += 20;
         doc.setFont(undefined,'normal').setFontSize(11);
@@ -998,7 +1006,7 @@ ${prompt}
           doc.text(lines, 70, y); y += lines.length * 12 + 20;
         });
 
-        doc.save(`AuditNIST_Informe_${data.id}.pdf`);
+        doc.save(`Audit_${auditEngine.frameworkKey.toUpperCase()}_${data.id}.pdf`);
       } catch (e) {
         console.error(e); alert(T('pdf_err') + e.message);
       }
@@ -1020,7 +1028,8 @@ ${prompt}
       txt += `${T('pdf_auditing_company')}: ${data.auditora}\n`;
       txt += `${T('pdf_auditor')}: ${data.auditor}\n`;
       txt += `${T('pdf_scope')}: ${data.alcance}\n`;
-      txt += `${T('pdf_date')}: ${data.fecha}\n\n`;
+      txt += `${T('pdf_date')}: ${data.fecha}\n`;
+      txt += `Framework: ${auditEngine.getAdapter().getName()}\n\n`;
       txt += `${T('txt_controls_heading')}\n`;
 
       document.querySelectorAll('.control').forEach((blk, i) => {
@@ -1041,7 +1050,7 @@ ${prompt}
       });
 
       const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
-      saveAs(blob, `AuditNIST_Informe_${data.id}.txt`);
+      saveAs(blob, `Audit_${auditEngine.frameworkKey.toUpperCase()}_${data.id}.txt`);
     }
 
 
@@ -1091,6 +1100,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const savedLang = localStorage.getItem('auditnist_lang') || 'es';
   setLanguage(savedLang);
+
+  const savedFw = localStorage.getItem('auditnist_framework') || 'nist-csf';
+  auditEngine.setFramework(savedFw);
+  if (frameworkSelect) frameworkSelect.value = savedFw;
+  updateFrameworkUI();
 
   addControl();
 });

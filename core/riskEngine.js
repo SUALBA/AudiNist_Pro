@@ -22,6 +22,7 @@ export class RiskEngine {
       switch (ctrl.compliance) {
         case 'yes':
           summary.compliant++;
+          if (ctrl.risk === 'low') summary.low++; // compliant controls can still carry a low residual risk
           break;
         case 'no':
           summary.nonCompliant++;

@@ -1,17 +1,116 @@
 export class CisAdapter {
-  getKey() { return "cis"; }
-
-  getName() { return "CIS Controls v8"; }
-
-  getCategories() {
-    return ["IG1 – Basic", "IG2 – Foundational", "IG3 – Organizational"];
+  constructor() {
+    this.key = "cis";
+    this.name = "CIS Controls v8";
+    this.domains = {
+      "IG1 – Basic": [
+        { code: "CIS 1.1",  name: "Establish and maintain detailed enterprise asset inventory" },
+        { code: "CIS 1.2",  name: "Address unauthorized assets" },
+        { code: "CIS 2.1",  name: "Establish and maintain a software inventory" },
+        { code: "CIS 2.2",  name: "Ensure authorized software is currently supported" },
+        { code: "CIS 2.3",  name: "Address unauthorized software" },
+        { code: "CIS 3.3",  name: "Configure data access control lists" },
+        { code: "CIS 4.1",  name: "Establish and maintain a secure configuration process" },
+        { code: "CIS 4.2",  name: "Establish and maintain a secure configuration process for network infrastructure" },
+        { code: "CIS 5.1",  name: "Establish and maintain an inventory of accounts" },
+        { code: "CIS 5.2",  name: "Use unique passwords" },
+        { code: "CIS 5.3",  name: "Disable dormant accounts" },
+        { code: "CIS 5.4",  name: "Restrict administrator privileges to dedicated administrator accounts" },
+        { code: "CIS 6.1",  name: "Establish an access granting process" },
+        { code: "CIS 6.2",  name: "Establish an access revoking process" },
+        { code: "CIS 7.3",  name: "Perform automated operating system patch management" },
+        { code: "CIS 7.4",  name: "Perform automated application patch management" },
+        { code: "CIS 8.2",  name: "Collect audit logs" },
+        { code: "CIS 9.1",  name: "Ensure use of only fully supported browsers and email clients" },
+        { code: "CIS 10.1", name: "Deploy and maintain anti-malware software" },
+        { code: "CIS 10.2", name: "Configure automatic anti-malware signature updates" },
+        { code: "CIS 11.1", name: "Establish and maintain a data recovery process" },
+        { code: "CIS 11.2", name: "Perform automated backups" },
+        { code: "CIS 14.1", name: "Establish and maintain a security awareness program" },
+        { code: "CIS 14.2", name: "Train workforce members to recognize social engineering attacks" }
+      ],
+      "IG2 – Foundational": [
+        { code: "CIS 1.3",  name: "Utilize an active discovery tool to identify assets" },
+        { code: "CIS 2.4",  name: "Utilize automated software inventory tools" },
+        { code: "CIS 3.1",  name: "Establish and maintain a data management process" },
+        { code: "CIS 3.2",  name: "Establish and maintain a data inventory" },
+        { code: "CIS 3.4",  name: "Enforce data retention" },
+        { code: "CIS 3.5",  name: "Securely dispose of data" },
+        { code: "CIS 4.3",  name: "Configure automatic session locking on enterprise assets" },
+        { code: "CIS 5.5",  name: "Establish and maintain an inventory of service accounts" },
+        { code: "CIS 6.3",  name: "Require MFA for externally-exposed applications" },
+        { code: "CIS 6.4",  name: "Require MFA for remote network access" },
+        { code: "CIS 7.1",  name: "Establish and maintain a vulnerability management process" },
+        { code: "CIS 7.2",  name: "Establish and maintain a remediation process" },
+        { code: "CIS 7.5",  name: "Perform automated vulnerability scans of internal enterprise assets" },
+        { code: "CIS 8.1",  name: "Establish and maintain an audit log management process" },
+        { code: "CIS 8.3",  name: "Ensure adequate audit log storage" },
+        { code: "CIS 8.4",  name: "Standardize time synchronization" },
+        { code: "CIS 9.2",  name: "Use DNS filtering services" },
+        { code: "CIS 9.3",  name: "Maintain and enforce network-based URL filters" },
+        { code: "CIS 10.3", name: "Disable autorun and autoplay for removable media" },
+        { code: "CIS 11.3", name: "Protect recovery data" },
+        { code: "CIS 11.4", name: "Establish and maintain an isolated instance of recovery data" },
+        { code: "CIS 12.1", name: "Ensure network infrastructure is up-to-date" },
+        { code: "CIS 12.2", name: "Establish and maintain a secure network architecture" },
+        { code: "CIS 12.3", name: "Securely manage network infrastructure" },
+        { code: "CIS 13.1", name: "Centralize security event alerting" },
+        { code: "CIS 13.2", name: "Deploy a host-based intrusion detection solution" },
+        { code: "CIS 14.3", name: "Train workforce members on authentication best practices" },
+        { code: "CIS 14.4", name: "Train workforce on data handling best practices" },
+        { code: "CIS 15.1", name: "Establish and maintain an inventory of service providers" },
+        { code: "CIS 15.2", name: "Establish and maintain a service provider management policy" },
+        { code: "CIS 16.1", name: "Establish and maintain a secure application development process" },
+        { code: "CIS 16.2", name: "Establish and maintain a process to accept and address software vulnerabilities" },
+        { code: "CIS 17.1", name: "Designate personnel to manage incident handling" },
+        { code: "CIS 17.2", name: "Establish and maintain contact information for reporting incidents" }
+      ],
+      "IG3 – Organizational": [
+        { code: "CIS 3.6",  name: "Encrypt data on end-user devices" },
+        { code: "CIS 3.7",  name: "Establish and maintain a data classification scheme" },
+        { code: "CIS 3.12", name: "Segment data processing and storage based on sensitivity" },
+        { code: "CIS 3.13", name: "Deploy a data loss prevention solution" },
+        { code: "CIS 3.14", name: "Log sensitive data access" },
+        { code: "CIS 6.5",  name: "Require MFA for administrative access" },
+        { code: "CIS 6.6",  name: "Establish and maintain an inventory of authentication and authorization systems" },
+        { code: "CIS 6.7",  name: "Centralize access control" },
+        { code: "CIS 7.6",  name: "Perform automated vulnerability scans of externally-exposed enterprise assets" },
+        { code: "CIS 7.7",  name: "Remediate detected vulnerabilities" },
+        { code: "CIS 8.9",  name: "Centralize audit logs" },
+        { code: "CIS 8.10", name: "Retain audit logs" },
+        { code: "CIS 8.11", name: "Conduct audit log reviews" },
+        { code: "CIS 8.12", name: "Collect service provider logs" },
+        { code: "CIS 9.4",  name: "Restrict unnecessary or unauthorized browser and email client extensions" },
+        { code: "CIS 9.5",  name: "Implement DMARC" },
+        { code: "CIS 10.4", name: "Configure anti-malware scanning of removable media" },
+        { code: "CIS 13.4", name: "Perform traffic filtering between network segments" },
+        { code: "CIS 13.5", name: "Manage access control for remote assets" },
+        { code: "CIS 13.6", name: "Collect network traffic flow logs" },
+        { code: "CIS 13.7", name: "Deploy a host-based intrusion prevention solution" },
+        { code: "CIS 14.6", name: "Train workforce on recognizing and reporting security incidents" },
+        { code: "CIS 14.8", name: "Train workforce on identifying and reporting missing security updates" },
+        { code: "CIS 15.4", name: "Ensure service provider contracts include security requirements" },
+        { code: "CIS 15.5", name: "Assess service providers" },
+        { code: "CIS 16.3", name: "Perform root cause analysis on security vulnerabilities" },
+        { code: "CIS 16.6", name: "Use up-to-date and trusted third-party software components" },
+        { code: "CIS 16.7", name: "Use standard hardening configuration templates for application infrastructure" },
+        { code: "CIS 16.9", name: "Train developers in application security concepts and secure coding" },
+        { code: "CIS 17.4", name: "Establish and maintain an incident response process" },
+        { code: "CIS 17.5", name: "Assign key roles and responsibilities for incident response" },
+        { code: "CIS 17.7", name: "Conduct routine incident response exercises" },
+        { code: "CIS 18.1", name: "Establish and maintain a penetration testing program" },
+        { code: "CIS 18.2", name: "Perform periodic external penetration tests" },
+        { code: "CIS 18.3", name: "Remediate penetration test findings" },
+        { code: "CIS 18.4", name: "Validate security measures" },
+        { code: "CIS 18.5", name: "Perform periodic internal penetration tests" }
+      ]
+    };
   }
 
-  getControlPlaceholder() {
-    return "CIS 1.1";
-  }
-
-  getAIContext() {
-    return "CIS Controls Version 8";
-  }
+  getKey()                    { return this.key; }
+  getName()                   { return this.name; }
+  getCategories()             { return Object.keys(this.domains); }
+  getControlsByDomain(domain) { return this.domains[domain] || []; }
+  getControlPlaceholder()     { return "CIS 1.1"; }
+  getAIContext()              { return "CIS Controls Version 8"; }
 }

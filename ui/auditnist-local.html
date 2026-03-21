@@ -124,6 +124,12 @@
       <button onclick="addControl()"
               class="px-4 py-2 bg-cyberaccent text-black rounded hover:bg-blue-300"
               data-i18n="add_control_btn">+ Añadir Control</button>
+      <button onclick="expandAllControls()"
+              class="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-500 text-sm"
+              data-i18n="expand_all">↕ Expandir todo</button>
+      <button onclick="collapseAllControls()"
+              class="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-500 text-sm"
+              data-i18n="collapse_all">↕ Colapsar todo</button>
       <button onclick="generatePDF()"
               class="px-4 py-2 bg-cyberok text-black rounded hover:bg-green-400"
               data-i18n="generate_pdf_btn">📄 Generar Informe PDF</button>
@@ -794,7 +800,8 @@ ${prompt}
         template_load_btn:'Cargar Controles Seleccionados',
         template_select_all:'Seleccionar todo',
         template_loading:'Cargando biblioteca...',
-        template_server_err:'La Biblioteca de Plantillas requiere el servidor local. Abre el archivo con: python -m http.server 8080'
+        template_server_err:'La Biblioteca de Plantillas requiere el servidor local. Abre el archivo con: python -m http.server 8080',
+        expand_all:'↕ Expandir todo', collapse_all:'↕ Colapsar todo'
       },
       en: {
         clear_data:'Clear Data', nist_function_label:'NIST Function',
@@ -850,7 +857,8 @@ ${prompt}
         template_load_btn:'Load Selected Controls',
         template_select_all:'Select All',
         template_loading:'Loading library...',
-        template_server_err:'Template Library requires the local server. Open with: python -m http.server 8080'
+        template_server_err:'Template Library requires the local server. Open with: python -m http.server 8080',
+        expand_all:'↕ Expand All', collapse_all:'↕ Collapse All'
       },
       fr: {
         clear_data:'Effacer les données', nist_function_label:'Fonction NIST',
@@ -906,7 +914,8 @@ ${prompt}
         template_load_btn:'Charger les Contrôles Sélectionnés',
         template_select_all:'Tout sélectionner',
         template_loading:'Chargement...',
-        template_server_err:'La bibliothèque nécessite le serveur local : python -m http.server 8080'
+        template_server_err:'La bibliothèque nécessite le serveur local : python -m http.server 8080',
+        expand_all:'↕ Tout développer', collapse_all:'↕ Tout réduire'
       },
       de: {
         clear_data:'Daten löschen', nist_function_label:'NIST-Funktion',
@@ -962,7 +971,8 @@ ${prompt}
         template_load_btn:'Ausgewählte Kontrollen laden',
         template_select_all:'Alle auswählen',
         template_loading:'Wird geladen...',
-        template_server_err:'Die Bibliothek erfordert den lokalen Server: python -m http.server 8080'
+        template_server_err:'Die Bibliothek erfordert den lokalen Server: python -m http.server 8080',
+        expand_all:'↕ Alle erweitern', collapse_all:'↕ Alle reduzieren'
       },
       pt: {
         clear_data:'Limpar dados', nist_function_label:'Função NIST',
@@ -1018,7 +1028,8 @@ ${prompt}
         template_load_btn:'Carregar Controles Selecionados',
         template_select_all:'Selecionar tudo',
         template_loading:'Carregando...',
-        template_server_err:'A biblioteca requer o servidor local: python -m http.server 8080'
+        template_server_err:'A biblioteca requer o servidor local: python -m http.server 8080',
+        expand_all:'↕ Expandir tudo', collapse_all:'↕ Recolher tudo'
       },
       ar: {
         clear_data:'مسح البيانات', nist_function_label:'وظيفة NIST',
@@ -1074,7 +1085,8 @@ ${prompt}
         template_load_btn:'تحميل الضوابط المحددة',
         template_select_all:'تحديد الكل',
         template_loading:'جاري التحميل...',
-        template_server_err:'تتطلب المكتبة الخادم المحلي: python -m http.server 8080'
+        template_server_err:'تتطلب المكتبة الخادم المحلي: python -m http.server 8080',
+        expand_all:'↕ توسيع الكل', collapse_all:'↕ طي الكل'
       },
       zh: {
         clear_data:'清除数据', nist_function_label:'NIST 功能',
@@ -1130,7 +1142,8 @@ ${prompt}
         template_load_btn:'加载所选控制项',
         template_select_all:'全选',
         template_loading:'加载中...',
-        template_server_err:'模板库需要本地服务器：python -m http.server 8080'
+        template_server_err:'模板库需要本地服务器：python -m http.server 8080',
+        expand_all:'↕ 全部展开', collapse_all:'↕ 全部折叠'
       }
     };
 
@@ -1335,59 +1348,85 @@ async function suggestControls() {
     }
 
     // ── Control blocks ────────────────────────────────────────────────────────
-    function addControl() {
+    function addControl(startCollapsed = false) {
       const wrapper = document.createElement('div');
-      wrapper.className = 'control bg-gray-800 p-4 rounded border border-gray-700 relative';
+      wrapper.className = 'control bg-gray-800 rounded border border-gray-700';
       const probOpts = `<option value="">${T('select_placeholder')}</option>` +
         [...Array(11).keys()].map(i => `<option value="${i}">${T('prob_' + i)}</option>`).join('');
       const solOpts = `<option value="">${T('select_placeholder')}</option>` +
         [...Array(11).keys()].map(i => `<option value="${i}">${T('sol_' + i)}</option>`).join('');
+      const placeholder = auditEngine.getAdapter().getControlPlaceholder();
       wrapper.innerHTML = `
-        <button class="remove-btn absolute top-2 right-2 bg-cyberevil text-black px-2 py-1 rounded"
-                onclick="this.parentNode.remove(); updateAll()">×</button>
-        <label class="font-bold text-cyberaccent" data-i18n="problem_label">${T('problem_label')}</label>
-        <select class="problem mt-1 w-full bg-gray-700 text-gray-100 p-2 rounded" onchange="toggleOther(this)">
-          ${probOpts}
-        </select>
-        <input class="problem-other mt-1 w-full p-2 rounded bg-gray-700 text-gray-100 hidden"
-               placeholder="${T('problem_other_ph')}"/>
-        <label class="font-bold text-cyberaccent mt-4" data-i18n="solution_label">${T('solution_label')}</label>
-        <select class="solution mt-1 w-full bg-gray-700 text-gray-100 p-2 rounded" onchange="toggleOther(this)">
-          ${solOpts}
-        </select>
-        <input class="solution-other mt-1 w-full p-2 rounded bg-gray-700 text-gray-100 hidden"
-               placeholder="${T('solution_other_ph')}"/>
-        <label class="font-bold text-cyberaccent mt-4" data-i18n="control_label">${T('control_label')}</label>
-        <input class="ctrl mt-1 w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="PR.AC-1"/>
-        <div class="grid grid-cols-2 gap-4 mt-4">
-          <div>
-            <label class="font-bold text-cyberaccent" data-i18n="complies_label">${T('complies_label')}</label>
-            <select class="cumple mt-1 w-full bg-gray-700 text-gray-100 p-2 rounded" onchange="updateAll()">
-              <option value="">--</option>
-              <option value="yes">${T('yes')}</option>
-              <option value="no">${T('no')}</option>
-              <option value="partial">${T('partial')}</option>
-            </select>
-          </div>
-          <div>
-            <label class="font-bold text-cyberaccent" data-i18n="risk_label">${T('risk_label')}</label>
-            <select class="riesgo mt-1 w-full bg-gray-700 text-gray-100 p-2 rounded" onchange="updateAll()">
-              <option value="">--</option>
-              <option value="high">${T('high')}</option>
-              <option value="medium">${T('medium')}</option>
-              <option value="low">${T('low')}</option>
-            </select>
-          </div>
+        <!-- Always-visible header row -->
+        <div class="control-header flex items-center gap-2 px-3 py-2 cursor-pointer select-none"
+             onclick="toggleControlCollapse(this.parentNode)">
+          <span class="collapse-icon text-gray-400 text-xs w-4 shrink-0">${startCollapsed ? '▶' : '▼'}</span>
+          <input class="ctrl flex-1 min-w-0 bg-transparent text-cyberaccent font-mono text-sm font-bold
+                        border-b border-gray-600 focus:outline-none focus:border-cyberaccent py-0.5"
+                 placeholder="${placeholder}"
+                 onclick="event.stopPropagation()" onchange="updateAll()"/>
+          <select class="cumple text-xs bg-gray-700 text-gray-100 rounded px-1 py-1 border border-gray-600 shrink-0"
+                  onchange="updateAll(); event.stopPropagation()">
+            <option value="">--</option>
+            <option value="yes">${T('yes')}</option>
+            <option value="no">${T('no')}</option>
+            <option value="partial">${T('partial')}</option>
+          </select>
+          <select class="riesgo text-xs bg-gray-700 text-gray-100 rounded px-1 py-1 border border-gray-600 shrink-0"
+                  onchange="updateAll(); event.stopPropagation()">
+            <option value="">--</option>
+            <option value="high">${T('high')}</option>
+            <option value="medium">${T('medium')}</option>
+            <option value="low">${T('low')}</option>
+          </select>
+          <button class="remove-btn shrink-0 bg-cyberevil text-black px-2 py-0.5 rounded text-xs hover:bg-red-600"
+                  onclick="this.closest('.control').remove(); updateAll(); event.stopPropagation()">×</button>
         </div>
-        <label class="font-bold text-cyberaccent mt-4" data-i18n="evidence_label">${T('evidence_label')}</label>
-        <button onclick="autoFillEvidence(this)"
-                class="mt-1 mb-2 px-2 py-1 bg-cyberwarn text-black rounded"
-                data-i18n="ai_evidence_btn">${T('ai_evidence_btn')}</button>
-        <textarea class="evidencia mt-1 w-full p-2 rounded bg-gray-700 text-gray-100"
-                  rows="3" placeholder="${T('evidence_ph')}"></textarea>
+        <!-- Collapsible detail body -->
+        <div class="control-body border-t border-gray-700 p-4 ${startCollapsed ? 'hidden' : ''}">
+          <label class="font-bold text-cyberaccent" data-i18n="problem_label">${T('problem_label')}</label>
+          <select class="problem mt-1 w-full bg-gray-700 text-gray-100 p-2 rounded" onchange="toggleOther(this)">
+            ${probOpts}
+          </select>
+          <input class="problem-other mt-1 w-full p-2 rounded bg-gray-700 text-gray-100 hidden"
+                 placeholder="${T('problem_other_ph')}"/>
+          <label class="font-bold text-cyberaccent mt-4 block" data-i18n="solution_label">${T('solution_label')}</label>
+          <select class="solution mt-1 w-full bg-gray-700 text-gray-100 p-2 rounded" onchange="toggleOther(this)">
+            ${solOpts}
+          </select>
+          <input class="solution-other mt-1 w-full p-2 rounded bg-gray-700 text-gray-100 hidden"
+                 placeholder="${T('solution_other_ph')}"/>
+          <label class="font-bold text-cyberaccent mt-4 block" data-i18n="evidence_label">${T('evidence_label')}</label>
+          <button onclick="autoFillEvidence(this)"
+                  class="mt-1 mb-2 px-2 py-1 bg-cyberwarn text-black rounded"
+                  data-i18n="ai_evidence_btn">${T('ai_evidence_btn')}</button>
+          <textarea class="evidencia mt-1 w-full p-2 rounded bg-gray-700 text-gray-100"
+                    rows="3" placeholder="${T('evidence_ph')}"></textarea>
+        </div>
       `;
       document.getElementById('controls').appendChild(wrapper);
       updateAll();
+    }
+
+    function toggleControlCollapse(controlDiv) {
+      const body = controlDiv.querySelector('.control-body');
+      const icon = controlDiv.querySelector('.collapse-icon');
+      const nowHidden = body.classList.toggle('hidden');
+      icon.textContent = nowHidden ? '▶' : '▼';
+    }
+
+    function expandAllControls() {
+      document.querySelectorAll('.control').forEach(c => {
+        c.querySelector('.control-body').classList.remove('hidden');
+        c.querySelector('.collapse-icon').textContent = '▼';
+      });
+    }
+
+    function collapseAllControls() {
+      document.querySelectorAll('.control').forEach(c => {
+        c.querySelector('.control-body').classList.add('hidden');
+        c.querySelector('.collapse-icon').textContent = '▶';
+      });
     }
 
     function toggleOther(sel) {
@@ -1792,7 +1831,7 @@ function loadSelectedTemplateControls() {
   const selected = [...document.querySelectorAll('.template-ctrl-check:checked')];
   if (selected.length === 0) { alert(T('write_notes_alert')); return; }
   selected.forEach(cb => {
-    addControl();
+    addControl(true);  // start collapsed — prevents overwhelming scroll
     const ctrls = document.querySelectorAll('.ctrl');
     if (ctrls.length > 0) ctrls[ctrls.length - 1].value = cb.dataset.ids;
   });
@@ -1805,6 +1844,9 @@ window.closeTemplateLibrary = closeTemplateLibrary;
 window.switchVertical = switchVertical;
 window.selectAllTemplateControls = selectAllTemplateControls;
 window.loadSelectedTemplateControls = loadSelectedTemplateControls;
+window.toggleControlCollapse = toggleControlCollapse;
+window.expandAllControls = expandAllControls;
+window.collapseAllControls = collapseAllControls;
 
 // ── End Template Library ─────────────────────────────────────────────────────
 

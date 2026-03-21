@@ -43,14 +43,19 @@
               data-i18n="clear_data">Limpiar datos</button>
     </div>
   </header>
-<label class="text-sm text-gray-300 mr-2">Framework:</label>
-<select id="framework-select"
-        class="bg-cyberpanel text-white border border-cyberaccent px-3 py-1 rounded">
-  <option value="nist-csf">NIST CSF 2.0</option>
-  <option value="iso27001">ISO 27001</option>
-  <option value="cis">CIS Controls v8</option>
-  <option value="cobit">COBIT 2019</option>
-</select>
+<div class="container mx-auto px-4 pb-2 flex items-center gap-3 flex-wrap">
+  <label class="text-sm text-gray-300">Framework:</label>
+  <select id="framework-select"
+          class="bg-cyberpanel text-white border border-cyberaccent px-3 py-1 rounded">
+    <option value="nist-csf">NIST CSF 2.0</option>
+    <option value="iso27001">ISO 27001</option>
+    <option value="cis">CIS Controls v8</option>
+    <option value="cobit">COBIT 2019</option>
+  </select>
+  <button id="template-library-btn" onclick="openTemplateLibrary()"
+          class="px-3 py-1 bg-cyberaccent text-black font-bold rounded text-sm hover:bg-blue-300"
+          data-i18n="template_library_btn">📚 Biblioteca de Plantillas</button>
+</div>
 
 
   <!-- Suggest Controls -->
@@ -782,7 +787,14 @@ ${prompt}
         sol_6:'Actualizar o sustituir el antivirus/firewall',
         sol_7:'Establecer reglas y control sobre el uso de herramientas ofensivas',
         sol_8:'Auditar y eliminar usuarios inactivos regularmente',
-        sol_9:'Segregar la red por VLANs o zonas de confianza', sol_10:'Otro...'
+        sol_9:'Segregar la red por VLANs o zonas de confianza', sol_10:'Otro...',
+        template_library_btn:'📚 Biblioteca de Plantillas',
+        template_library_title:'Biblioteca de Plantillas — Selecciona un Sector Industrial',
+        template_no_controls:'No se encontraron controles para este sector con el framework activo.',
+        template_load_btn:'Cargar Controles Seleccionados',
+        template_select_all:'Seleccionar todo',
+        template_loading:'Cargando biblioteca...',
+        template_server_err:'La Biblioteca de Plantillas requiere el servidor local. Abre el archivo con: python -m http.server 8080'
       },
       en: {
         clear_data:'Clear Data', nist_function_label:'NIST Function',
@@ -831,7 +843,14 @@ ${prompt}
         sol_6:'Update or replace antivirus/firewall',
         sol_7:'Establish rules for the use of offensive tools',
         sol_8:'Audit and remove inactive users regularly',
-        sol_9:'Segment the network using VLANs or trust zones', sol_10:'Other...'
+        sol_9:'Segment the network using VLANs or trust zones', sol_10:'Other...',
+        template_library_btn:'📚 Template Library',
+        template_library_title:'Template Library — Select an Industry Vertical',
+        template_no_controls:'No controls found for this vertical with the active framework.',
+        template_load_btn:'Load Selected Controls',
+        template_select_all:'Select All',
+        template_loading:'Loading library...',
+        template_server_err:'Template Library requires the local server. Open with: python -m http.server 8080'
       },
       fr: {
         clear_data:'Effacer les données', nist_function_label:'Fonction NIST',
@@ -880,7 +899,14 @@ ${prompt}
         sol_6:'Mettre à jour ou remplacer l\'antivirus/pare-feu',
         sol_7:'Établir des règles pour l\'utilisation des outils offensifs',
         sol_8:'Auditer et supprimer régulièrement les utilisateurs inactifs',
-        sol_9:'Segmenter le réseau par VLANs ou zones de confiance', sol_10:'Autre...'
+        sol_9:'Segmenter le réseau par VLANs ou zones de confiance', sol_10:'Autre...',
+        template_library_btn:'📚 Bibliothèque de Modèles',
+        template_library_title:'Bibliothèque de Modèles — Sélectionnez un Secteur',
+        template_no_controls:'Aucun contrôle trouvé pour ce secteur avec le framework actif.',
+        template_load_btn:'Charger les Contrôles Sélectionnés',
+        template_select_all:'Tout sélectionner',
+        template_loading:'Chargement...',
+        template_server_err:'La bibliothèque nécessite le serveur local : python -m http.server 8080'
       },
       de: {
         clear_data:'Daten löschen', nist_function_label:'NIST-Funktion',
@@ -929,7 +955,14 @@ ${prompt}
         sol_6:'Virenschutz/Firewall aktualisieren oder ersetzen',
         sol_7:'Regeln für den Einsatz offensiver Werkzeuge festlegen',
         sol_8:'Inaktive Benutzer regelmäßig prüfen und entfernen',
-        sol_9:'Netzwerk durch VLANs segmentieren', sol_10:'Sonstige...'
+        sol_9:'Netzwerk durch VLANs segmentieren', sol_10:'Sonstige...',
+        template_library_btn:'📚 Vorlagenbibliothek',
+        template_library_title:'Vorlagenbibliothek — Branche auswählen',
+        template_no_controls:'Keine Kontrollen für diesen Bereich mit dem aktiven Framework gefunden.',
+        template_load_btn:'Ausgewählte Kontrollen laden',
+        template_select_all:'Alle auswählen',
+        template_loading:'Wird geladen...',
+        template_server_err:'Die Bibliothek erfordert den lokalen Server: python -m http.server 8080'
       },
       pt: {
         clear_data:'Limpar dados', nist_function_label:'Função NIST',
@@ -978,7 +1011,14 @@ ${prompt}
         sol_6:'Atualizar ou substituir antivírus/firewall',
         sol_7:'Estabelecer regras para o uso de ferramentas ofensivas',
         sol_8:'Auditar e remover usuários inativos regularmente',
-        sol_9:'Segmentar a rede por VLANs ou zonas de confiança', sol_10:'Outro...'
+        sol_9:'Segmentar a rede por VLANs ou zonas de confiança', sol_10:'Outro...',
+        template_library_btn:'📚 Biblioteca de Modelos',
+        template_library_title:'Biblioteca de Modelos — Selecione um Setor',
+        template_no_controls:'Nenhum controle encontrado para este setor com o framework ativo.',
+        template_load_btn:'Carregar Controles Selecionados',
+        template_select_all:'Selecionar tudo',
+        template_loading:'Carregando...',
+        template_server_err:'A biblioteca requer o servidor local: python -m http.server 8080'
       },
       ar: {
         clear_data:'مسح البيانات', nist_function_label:'وظيفة NIST',
@@ -1027,7 +1067,14 @@ ${prompt}
         sol_6:'تحديث أو استبدال مضاد الفيروسات/جدار الحماية',
         sol_7:'وضع قواعد للتحكم في استخدام أدوات الهجوم',
         sol_8:'مراجعة وحذف المستخدمين غير النشطين بانتظام',
-        sol_9:'تجزئة الشبكة باستخدام VLANs أو مناطق الثقة', sol_10:'أخرى...'
+        sol_9:'تجزئة الشبكة باستخدام VLANs أو مناطق الثقة', sol_10:'أخرى...',
+        template_library_btn:'📚 مكتبة القوالب',
+        template_library_title:'مكتبة القوالب — اختر القطاع الصناعي',
+        template_no_controls:'لا توجد ضوابط لهذا القطاع مع الإطار النشط.',
+        template_load_btn:'تحميل الضوابط المحددة',
+        template_select_all:'تحديد الكل',
+        template_loading:'جاري التحميل...',
+        template_server_err:'تتطلب المكتبة الخادم المحلي: python -m http.server 8080'
       },
       zh: {
         clear_data:'清除数据', nist_function_label:'NIST 功能',
@@ -1076,7 +1123,14 @@ ${prompt}
         sol_6:'更新或替换防病毒/防火墙',
         sol_7:'制定攻击性工具使用规则',
         sol_8:'定期审核并删除不活跃用户',
-        sol_9:'通过 VLAN 或信任区域对网络进行分段', sol_10:'其他...'
+        sol_9:'通过 VLAN 或信任区域对网络进行分段', sol_10:'其他...',
+        template_library_btn:'📚 模板库',
+        template_library_title:'模板库 — 选择行业领域',
+        template_no_controls:'未找到适用于当前框架和行业的控制项。',
+        template_load_btn:'加载所选控制项',
+        template_select_all:'全选',
+        template_loading:'加载中...',
+        template_server_err:'模板库需要本地服务器：python -m http.server 8080'
       }
     };
 
@@ -1640,6 +1694,120 @@ function updateFrameworkUI() {
     // ── Init ──────────────────────────────────────────────────────────────────
  
 
+// ── Template Library ────────────────────────────────────────────────────────
+let scfData = null;
+let activeVertical = 'general';
+
+const VERTICAL_META = {
+  general:    { label: 'General',    icon: '🌐' },
+  healthcare: { label: 'Healthcare', icon: '🏥' },
+  finance:    { label: 'Finance',    icon: '🏦' },
+  government: { label: 'Government', icon: '🏛️' },
+  defense:    { label: 'Defense',    icon: '🛡️' },
+  privacy:    { label: 'Privacy',    icon: '🔒' },
+};
+
+async function openTemplateLibrary() {
+  const modal = document.getElementById('template-modal');
+  modal.style.display = 'flex';
+
+  // Update modal title and button labels from i18n
+  document.getElementById('template-modal-title').textContent = T('template_library_title');
+  document.getElementById('template-select-all-btn').textContent = T('template_select_all');
+  document.getElementById('template-load-btn').textContent = T('template_load_btn');
+
+  if (!scfData) {
+    document.getElementById('template-controls-list').innerHTML =
+      `<p class="text-cyberwarn text-center py-8">${T('template_loading')}</p>`;
+    scfData = await fetch('../data/scf-controls.json')
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .catch(() => null);
+    if (!scfData) {
+      document.getElementById('template-controls-list').innerHTML =
+        `<p class="text-cyberevil text-center py-8 text-sm">${T('template_server_err')}</p>`;
+      return;
+    }
+  }
+  renderVerticalTabs();
+  renderTemplateControls(activeVertical);
+}
+
+function closeTemplateLibrary() {
+  document.getElementById('template-modal').style.display = 'none';
+}
+
+function renderVerticalTabs() {
+  const container = document.getElementById('vertical-tabs');
+  container.innerHTML = Object.entries(VERTICAL_META).map(([v, meta]) => `
+    <button onclick="switchVertical('${v}')"
+            class="px-3 py-2 rounded-lg text-sm font-bold transition-colors ${v === activeVertical
+              ? 'bg-cyberaccent text-black'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}">
+      ${meta.icon} ${meta.label}
+    </button>`).join('');
+}
+
+function switchVertical(v) {
+  activeVertical = v;
+  renderVerticalTabs();
+  renderTemplateControls(v);
+}
+
+function renderTemplateControls(vertical) {
+  const fw = auditEngine.frameworkKey;
+  const filtered = scfData.controls.filter(c =>
+    c.verticals.includes(vertical) && c.mappings[fw] && c.mappings[fw].length > 0
+  );
+  const list = document.getElementById('template-controls-list');
+  if (filtered.length === 0) {
+    list.innerHTML = `<p class="text-gray-400 text-center py-8">${T('template_no_controls')}</p>`;
+    return;
+  }
+  list.innerHTML = filtered.map(c => {
+    const ids = c.mappings[fw].slice(0, 3).join(', ');
+    const safeQuestion = c.question.replace(/</g,'&lt;').replace(/>/g,'&gt;').substring(0, 120);
+    const safeName = c.name.replace(/"/g, '&quot;');
+    return `
+    <label class="flex items-start gap-3 p-3 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 border border-transparent hover:border-cyberaccent">
+      <input type="checkbox" class="template-ctrl-check mt-1 accent-cyberaccent"
+             data-ids="${ids.replace(/"/g,'&quot;')}"
+             data-name="${safeName}" />
+      <div class="flex-1 min-w-0">
+        <div class="flex items-baseline gap-2 flex-wrap">
+          <span class="font-bold text-cyberaccent text-sm">${c.id}</span>
+          <span class="text-white text-sm">${c.name}</span>
+        </div>
+        <p class="text-xs text-gray-400 mt-1">${safeQuestion}${c.question.length > 120 ? '…' : ''}</p>
+        <p class="text-xs text-green-400 mt-1">&#8594; ${ids}</p>
+      </div>
+    </label>`;
+  }).join('');
+}
+
+function selectAllTemplateControls() {
+  document.querySelectorAll('.template-ctrl-check').forEach(cb => cb.checked = true);
+}
+
+function loadSelectedTemplateControls() {
+  const selected = [...document.querySelectorAll('.template-ctrl-check:checked')];
+  if (selected.length === 0) { alert(T('write_notes_alert')); return; }
+  selected.forEach(cb => {
+    addControl();
+    const ctrls = document.querySelectorAll('.ctrl');
+    if (ctrls.length > 0) ctrls[ctrls.length - 1].value = cb.dataset.ids;
+  });
+  closeTemplateLibrary();
+  updateAll();
+}
+
+window.openTemplateLibrary = openTemplateLibrary;
+window.closeTemplateLibrary = closeTemplateLibrary;
+window.switchVertical = switchVertical;
+window.selectAllTemplateControls = selectAllTemplateControls;
+window.loadSelectedTemplateControls = loadSelectedTemplateControls;
+
+// ── End Template Library ─────────────────────────────────────────────────────
+
 window.saveProgress = saveProgress;
 window.clearData = clearData;
 window.addControl = addControl;
@@ -1673,5 +1841,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   </script>
+
+  <!-- ── Template Library Modal ──────────────────────────────────────────── -->
+  <div id="template-modal"
+       class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden items-center justify-center"
+       style="display:none">
+    <div class="bg-cyberpanel border border-cyberaccent rounded-xl w-11/12 max-w-5xl flex flex-col"
+         style="max-height:90vh">
+      <!-- Modal header -->
+      <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+        <h2 class="text-lg font-bold text-cyberaccent" id="template-modal-title">Template Library</h2>
+        <button onclick="closeTemplateLibrary()"
+                class="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+      </div>
+      <!-- Vertical tabs -->
+      <div id="vertical-tabs" class="flex gap-2 p-4 border-b border-gray-700 flex-wrap"></div>
+      <!-- Controls list -->
+      <div id="template-controls-list" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
+      <!-- Footer -->
+      <div class="p-4 border-t border-gray-700 flex justify-between items-center">
+        <button onclick="selectAllTemplateControls()"
+                id="template-select-all-btn"
+                class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500">Select All</button>
+        <button onclick="loadSelectedTemplateControls()"
+                id="template-load-btn"
+                class="px-4 py-2 bg-cyberaccent text-black font-bold rounded hover:bg-blue-300">
+          Load Selected Controls
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

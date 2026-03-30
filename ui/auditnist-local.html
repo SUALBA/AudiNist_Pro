@@ -791,21 +791,21 @@ data-vertical="${vertical}"
 onclick="event.stopPropagation()" readonly />
 <div class="flex items-center gap-2 text-xs">
 <div class="flex flex-col items-start">
-<span class="text-gray-400 text-[10px]">STATUS</span>
+<span class="text-gray-400 text-[10px]">${T('status_label')}</span>
 <select class="cumple bg-gray-700 text-white rounded px-1 py-1" onchange="onComplianceChange(this)">
 <option value="">--</option>
-<option value="yes" data-i18n="yes">Sí</option>
-<option value="no" data-i18n="no">No</option>
-<option value="partial" data-i18n="partial">Parcial</option>
+<option value="yes" data-i18n="yes">${T('yes')}</option>
+<option value="no" data-i18n="no">${T('no')}</option>
+<option value="partial" data-i18n="partial">${T('partial')}</option>
 </select>
 </div>
 <div class="flex flex-col items-start">
-<span class="text-gray-400 text-[10px]">RISK</span>
+<span class="text-gray-400 text-[10px]">${T('risk_label')}</span>
 <select class="riesgo bg-gray-700 text-white rounded px-1 py-1">
 <option value="">--</option>
-<option value="high" data-i18n="high">Alto</option>
-<option value="medium" data-i18n="medium">Medio</option>
-<option value="low" data-i18n="low">Bajo</option>
+<option value="high" data-i18n="high">${T('high')}</option>
+<option value="medium" data-i18n="medium">${T('medium')}</option>
+<option value="low" data-i18n="low">${T('low')}</option>
 </select>
 </div>
 </div>
@@ -815,16 +815,16 @@ onclick="removeControl(this); event.stopPropagation()">×</button>
 <div class="control-body border-t border-gray-700 p-4 ${startCollapsed ? 'hidden' : ''}">
 ${question ? `
 <div class="mb-3 p-3 bg-gray-900 rounded border border-cyberaccent">
-<label class="text-xs text-cyberaccent font-bold">📋 PREGUNTA DE AUDITORÍA</label>
+<label class="text-xs text-cyberaccent font-bold">${T('audit_question_label')}</label>
 <p class="text-sm text-gray-300 mt-1">${question}</p>
 </div>
 ` : ''}
-<label class="text-xs text-cyberaccent">NOTAS DEL AUDITOR</label>
+<label class="text-xs text-cyberaccent">${T('auditor_notes_label')}</label>
 <textarea class="notes w-full mt-1 p-2 rounded bg-gray-700 text-gray-100"
-rows="2" placeholder="Observaciones..."></textarea>
-<label class="text-xs text-cyberaccent mt-3 block">EVIDENCIA</label>
+rows="2" placeholder="${T('notes_ph')}"></textarea>
+<label class="text-xs text-cyberaccent mt-3 block">${T('evidence_label')}</label>
 <textarea class="evidencia w-full p-2 rounded bg-gray-700 text-gray-100"
-rows="3" placeholder="Describe la evidencia..."></textarea>
+rows="3" placeholder="${T('evidence_ph')}"></textarea>
 </div>
 `;
 
@@ -1671,7 +1671,11 @@ chart_eval_title:'📈 Evaluaciones',
 template_search_ph:'🔍 Buscar controles...', template_select_all:'Seleccionar todo',
 template_load_btn:'Cargar Seleccionados', template_no_results:'No se encontraron controles',
 vertical_general:'General', vertical_healthcare:'Salud', vertical_finance:'Finanzas',
-vertical_government:'Gobierno', vertical_defense:'Defensa', vertical_privacy:'Privacidad'
+vertical_government:'Gobierno', vertical_defense:'Defensa', vertical_privacy:'Privacidad',
+status_label:'ESTADO', risk_label:'RIESGO',
+audit_question_label:'📋 PREGUNTA DE AUDITORÍA',
+auditor_notes_label:'NOTAS DEL AUDITOR', notes_ph:'Observaciones...',
+evidence_label:'EVIDENCIA', evidence_ph:'Describe la evidencia...'
 },
 en: {
 clear_data:'Clear Data', nist_function_label:'Domain',
@@ -1709,7 +1713,11 @@ chart_eval_title:'📈 Evaluations',
 template_search_ph:'🔍 Search controls...', template_select_all:'Select All',
 template_load_btn:'Load Selected', template_no_results:'No controls found',
 vertical_general:'General', vertical_healthcare:'Healthcare', vertical_finance:'Finance',
-vertical_government:'Government', vertical_defense:'Defense', vertical_privacy:'Privacy'
+vertical_government:'Government', vertical_defense:'Defense', vertical_privacy:'Privacy',
+status_label:'STATUS', risk_label:'RISK',
+audit_question_label:'📋 AUDIT QUESTION',
+auditor_notes_label:'AUDITOR NOTES', notes_ph:'Observations...',
+evidence_label:'EVIDENCE', evidence_ph:'Describe the evidence...'
 },
 fr: {
 clear_data:'Effacer données', nist_function_label:'Domaine',
@@ -1747,7 +1755,11 @@ chart_eval_title:'📈 Évaluations',
 template_search_ph:'🔍 Rechercher contrôles...', template_select_all:'Tout sélectionner',
 template_load_btn:'Charger la sélection', template_no_results:'Aucun contrôle trouvé',
 vertical_general:'Général', vertical_healthcare:'Santé', vertical_finance:'Finance',
-vertical_government:'Gouvernement', vertical_defense:'Défense', vertical_privacy:'Confidentialité'
+vertical_government:'Gouvernement', vertical_defense:'Défense', vertical_privacy:'Confidentialité',
+status_label:'STATUT', risk_label:'RISQUE',
+audit_question_label:'📋 QUESTION D\'AUDIT',
+auditor_notes_label:'NOTES DE L\'AUDITEUR', notes_ph:'Observations...',
+evidence_label:'PREUVE', evidence_ph:'Décrivez la preuve...'
 },
 de: {
 clear_data:'Daten löschen', nist_function_label:'Domäne',
@@ -1785,7 +1797,11 @@ chart_eval_title:'📈 Bewertungen',
 template_search_ph:'🔍 Kontrollen suchen...', template_select_all:'Alle auswählen',
 template_load_btn:'Auswahl laden', template_no_results:'Keine Kontrollen gefunden',
 vertical_general:'Allgemein', vertical_healthcare:'Gesundheit', vertical_finance:'Finanzen',
-vertical_government:'Regierung', vertical_defense:'Verteidigung', vertical_privacy:'Datenschutz'
+vertical_government:'Regierung', vertical_defense:'Verteidigung', vertical_privacy:'Datenschutz',
+status_label:'STATUS', risk_label:'RISIKO',
+audit_question_label:'📋 PRÜFFRAGE',
+auditor_notes_label:'PRÜFERNOTIZEN', notes_ph:'Beobachtungen...',
+evidence_label:'NACHWEIS', evidence_ph:'Nachweis beschreiben...'
 },
 pt: {
 clear_data:'Limpar dados', nist_function_label:'Domínio',
@@ -1823,7 +1839,11 @@ chart_eval_title:'📈 Avaliações',
 template_search_ph:'🔍 Pesquisar controles...', template_select_all:'Selecionar tudo',
 template_load_btn:'Carregar Selecionados', template_no_results:'Nenhum controle encontrado',
 vertical_general:'Geral', vertical_healthcare:'Saúde', vertical_finance:'Finanças',
-vertical_government:'Governo', vertical_defense:'Defesa', vertical_privacy:'Privacidade'
+vertical_government:'Governo', vertical_defense:'Defesa', vertical_privacy:'Privacidade',
+status_label:'STATUS', risk_label:'RISCO',
+audit_question_label:'📋 QUESTÃO DE AUDITORIA',
+auditor_notes_label:'NOTAS DO AUDITOR', notes_ph:'Observações...',
+evidence_label:'EVIDÊNCIA', evidence_ph:'Descreva a evidência...'
 },
 ar: {
 clear_data:'مسح البيانات', nist_function_label:'النطاق',
@@ -1861,7 +1881,11 @@ chart_eval_title:'📈 التقييمات',
 template_search_ph:'🔍 البحث في الضوابط...', template_select_all:'تحديد الكل',
 template_load_btn:'تحميل المحدد', template_no_results:'لم يتم العثور على ضوابط',
 vertical_general:'عام', vertical_healthcare:'الرعاية الصحية', vertical_finance:'المالية',
-vertical_government:'الحكومة', vertical_defense:'الدفاع', vertical_privacy:'الخصوصية'
+vertical_government:'الحكومة', vertical_defense:'الدفاع', vertical_privacy:'الخصوصية',
+status_label:'الحالة', risk_label:'المخاطرة',
+audit_question_label:'📋 سؤال التدقيق',
+auditor_notes_label:'ملاحظات المدقق', notes_ph:'الملاحظات...',
+evidence_label:'الدليل', evidence_ph:'صف الدليل...'
 },
 zh: {
 clear_data:'清除数据', nist_function_label:'域',
@@ -1899,7 +1923,11 @@ chart_eval_title:'📈 评估',
 template_search_ph:'🔍 搜索控制项...', template_select_all:'全选',
 template_load_btn:'加载所选', template_no_results:'未找到控制项',
 vertical_general:'通用', vertical_healthcare:'医疗', vertical_finance:'金融',
-vertical_government:'政府', vertical_defense:'国防', vertical_privacy:'隐私'
+vertical_government:'政府', vertical_defense:'国防', vertical_privacy:'隐私',
+status_label:'状态', risk_label:'风险',
+audit_question_label:'📋 审计问题',
+auditor_notes_label:'审计员备注', notes_ph:'观察...',
+evidence_label:'证据', evidence_ph:'描述证据...'
 }
 };
 

@@ -121,7 +121,7 @@ class="absolute w-full bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-
 
 <!-- Visual Grid -->
 <div id="controls-visual-grid"
-class="container mx-auto mt-4 grid grid-cols-4 md:grid-cols-8 gap-2">
+class="hidden container mx-auto mt-4 grid grid-cols-4 md:grid-cols-8 gap-2">
 </div>
 
 <!-- Suggest Controls -->
@@ -626,7 +626,24 @@ return this.store[scfId]?.evaluations || [];
 // 🔹 UI FUNCTIONS
 // ─────────────────────────────────────────────────────────────────────────────
 function showGridPreview() {
-// Grid is always visible — no-op kept for backwards compatibility
+const grid = document.getElementById('controls-visual-grid');
+grid.classList.remove('hidden');
+if (gridTimeout) clearTimeout(gridTimeout);
+gridTimeout = setTimeout(() => { grid.classList.add('hidden'); }, 5000);
+}
+
+function addControlFromGrid(scfId, fwCode, name) {
+// Don't add if already in workspace
+const existing = [...document.querySelectorAll('.ctrl')].find(el => el.dataset.scfId === scfId);
+if (existing) {
+existing.closest('.control').scrollIntoView({ behavior: 'smooth', block: 'center' });
+return;
+}
+const scfControl = scfData?.controls.find(c => c.id === scfId);
+const question = scfControl?.question || '';
+const vertical = scfControl?.verticals?.[0] || '';
+addControl(false, question, scfId, fwCode, name, vertical);
+document.getElementById('controls').lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function changeFramework() {
@@ -877,6 +894,7 @@ controlBlock.classList.add('border-cyberok', 'opacity-90');
 controlBlock.querySelector('.ctrl').classList.add('text-cyberok');
 
 renderControlGrid();
+updateFrameworkProgressBars();
 }
 isDirty = true;
 }
@@ -939,7 +957,9 @@ statusIcon = '⚠️';
 return `
 <div class="ctrl-box text-xs p-2 rounded border border-gray-600 ${statusClass} cursor-pointer relative"
 data-scf-id="${c.id}"
-data-fw-code="${fwCode}">
+data-fw-code="${fwCode}"
+title="${c.name}"
+onclick="addControlFromGrid('${c.id}','${fwCode}','${c.name.replace(/'/g,'&#39;')}')">
 <div class="font-bold">${fwCode}</div>
 <div class="text-[10px] opacity-70 truncate">${c.name}</div>
 <div class="absolute top-1 right-1 text-[10px]">${statusIcon}</div>
@@ -2017,6 +2037,7 @@ window.changeFramework = changeFramework;
 window.removeControl = removeControl;
 window.onComplianceChange = onComplianceChange;
 window.showGridPreview = showGridPreview;
+window.addControlFromGrid = addControlFromGrid;
 window.addEventListener('beforeunload', function (e) {
   if (isDirty) {
     e.preventDefault();

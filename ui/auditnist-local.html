@@ -21,6 +21,70 @@ cyberevil: '#ef4444', cyberwarn: '#facc15', cyberok: '#22c55e'
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// Control Data Models — validation layer (mirrors models/control.js etc.)
+// ─────────────────────────────────────────────────────────────────────────────
+class Control {
+  static VALID_COMPLIANCE = ['yes', 'no', 'partial', ''];
+  static VALID_RISK       = ['high', 'medium', 'low', ''];
+
+  constructor({ scfId='', fwCode='', name='', question='', vertical='', guidance='' } = {}) {
+    this.scfId=scfId; this.fwCode=fwCode; this.name=name;
+    this.question=question; this.vertical=vertical; this.guidance=guidance;
+    this.compliance=''; this.risk=''; this.evidence=''; this.notes='';
+    this.createdAt=Date.now(); this.updatedAt=Date.now();
+  }
+  setCompliance(v){ v=(v??'').toString(); if(!Control.VALID_COMPLIANCE.includes(v)) throw new Error(`Invalid compliance "${v}"`); this.compliance=v; this.updatedAt=Date.now(); return this; }
+  setRisk(v){ v=(v??'').toString(); if(!Control.VALID_RISK.includes(v)) throw new Error(`Invalid risk "${v}"`); this.risk=v; this.updatedAt=Date.now(); return this; }
+  setEvidence(t){ this.evidence=String(t??''); this.updatedAt=Date.now(); return this; }
+  setNotes(t)   { this.notes=String(t??'');    this.updatedAt=Date.now(); return this; }
+  isEvaluated(){ return this.compliance!==''; }
+  isCompliant() { return this.compliance==='yes'; }
+  isPartial()   { return this.compliance==='partial'; }
+  toJSON(){ return {scfId:this.scfId,fwCode:this.fwCode,name:this.name,question:this.question,vertical:this.vertical,compliance:this.compliance,risk:this.risk,evidence:this.evidence,notes:this.notes,createdAt:this.createdAt,updatedAt:this.updatedAt}; }
+  static fromJSON(d={}){ const c=new Control(d); c.compliance=d.compliance??''; c.risk=d.risk??''; c.evidence=d.evidence??''; c.notes=d.notes??''; c.createdAt=d.createdAt??Date.now(); c.updatedAt=d.updatedAt??Date.now(); return c; }
+  static validate(d={}){ const e=[]; if(d.compliance!==undefined&&!Control.VALID_COMPLIANCE.includes(d.compliance)) e.push(`compliance must be: ${Control.VALID_COMPLIANCE.filter(Boolean).join('|')}`); if(d.risk!==undefined&&!Control.VALID_RISK.includes(d.risk)) e.push(`risk must be: ${Control.VALID_RISK.filter(Boolean).join('|')}`); return e; }
+}
+
+class Evaluation {
+  static VALID_COMPLIANCE = ['yes', 'no', 'partial'];
+  static VALID_RISK       = ['high', 'medium', 'low', ''];
+
+  constructor({ scfId, auditId, compliance, risk='', evidence='', notes='', company='', auditor='', vertical='' }={}) {
+    const errs = Evaluation.validate({ scfId, auditId, compliance, risk });
+    if (errs.length) throw new Error(errs.join('; '));
+    this.scfId=scfId; this.auditId=auditId; this.compliance=compliance; this.risk=risk;
+    this.evidence=String(evidence??''); this.notes=String(notes??'');
+    this.company=company; this.auditor=auditor; this.vertical=vertical; this.timestamp=Date.now();
+  }
+  isCompliant(){ return this.compliance==='yes'; }
+  isPartial()  { return this.compliance==='partial'; }
+  isHighRisk() { return this.risk==='high'; }
+  toJSON(){ return {scfId:this.scfId,auditId:this.auditId,compliance:this.compliance,risk:this.risk,evidence:this.evidence,notes:this.notes,company:this.company,auditor:this.auditor,vertical:this.vertical,timestamp:this.timestamp}; }
+  static fromJSON(d={}){ return new Evaluation(d); }
+  static validate(d={}){ const e=[]; if(!d.scfId) e.push('scfId is required'); if(!d.auditId) e.push('auditId is required'); if(!Evaluation.VALID_COMPLIANCE.includes(d.compliance)) e.push(`compliance must be: ${Evaluation.VALID_COMPLIANCE.join('|')}`); if(d.risk&&!Evaluation.VALID_RISK.includes(d.risk)) e.push(`risk must be: ${Evaluation.VALID_RISK.filter(Boolean).join('|')}`); return e; }
+}
+
+class AuditSession {
+  constructor({ id='', empresa='', auditora='', auditor='', alcance='', fecha='', framework='nist-csf' }={}) {
+    this.id=id||`AUD-${Date.now()}`; this.empresa=empresa; this.auditora=auditora;
+    this.auditor=auditor; this.alcance=alcance; this.fecha=fecha||new Date().toLocaleDateString();
+    this.framework=framework; this.controls=[]; this.createdAt=Date.now(); this.updatedAt=Date.now();
+  }
+  addControl(c){ this.controls.push(c); this.updatedAt=Date.now(); }
+  getSummary(){
+    const total=this.controls.length, compliant=this.controls.filter(c=>c.compliance==='yes').length,
+          partial=this.controls.filter(c=>c.compliance==='partial').length,
+          nonCompliant=this.controls.filter(c=>c.compliance==='no').length,
+          highRisk=this.controls.filter(c=>c.risk==='high').length,
+          evaluated=this.controls.filter(c=>c.compliance!=='').length;
+    return {total,evaluated,compliant,partial,nonCompliant,highRisk};
+  }
+  toJSON(){ return {id:this.id,empresa:this.empresa,auditora:this.auditora,auditor:this.auditor,alcance:this.alcance,fecha:this.fecha,framework:this.framework,controls:this.controls.map(c=>c.toJSON?c.toJSON():c),createdAt:this.createdAt,updatedAt:this.updatedAt}; }
+  static fromJSON(d={}){ const s=new AuditSession(d); s.controls=(d.controls||[]).map(c=>Control.fromJSON(c)); s.createdAt=d.createdAt??Date.now(); s.updatedAt=d.updatedAt??Date.now(); return s; }
+}
+</script>
 </head>
 <body class="bg-cyberbg text-gray-100 font-mono min-h-screen flex flex-col">
 
@@ -881,6 +945,9 @@ company: document.getElementById('empresa_auditada').value || 'N/A',
 auditor: document.getElementById('auditor').value || 'N/A'
 };
 
+const _cvErrs = Evaluation.validate({ scfId, auditId: auditContext.auditId, compliance: select.value, risk: controlBlock.querySelector('.riesgo')?.value || '' });
+if (_cvErrs.length) console.warn('[Control Model] onComplianceChange validation:', _cvErrs);
+
 EvaluationRegistry.save(scfId, {
 scfId: scfId,
 compliance: select.value,
@@ -1250,7 +1317,9 @@ const ctrlsContainer = document.getElementById('controls');
 while (ctrlsContainer.firstChild) ctrlsContainer.removeChild(ctrlsContainer.firstChild);
 
 data.controls?.forEach(c => {
-addControl(false, c.question || '', c.scfId || '', '', c.ctrl.split(' – ')[1] || '', '');
+const _impErrs = Control.validate({ compliance: c.cumple, risk: c.riesgo });
+if (_impErrs.length) console.warn(`[Control Model] importFromJSON validation for "${c.ctrl}":`, _impErrs);
+addControl(false, c.question || '', c.scfId || '', '', (c.ctrl || '').split(' – ')[1] || c.ctrl || '', '');
 const wrapper = document.querySelectorAll('.control')[document.querySelectorAll('.control').length - 1];
 wrapper.querySelector('.cumple').value = c.cumple || '';
 wrapper.querySelector('.riesgo').addEventListener('change', (e) => {
@@ -1635,6 +1704,9 @@ function onRiskChange(select) {
     company: document.getElementById('empresa_auditada').value || 'N/A',
     auditor: document.getElementById('auditor').value || 'N/A'
   };
+
+  const _rvErrs = Evaluation.validate({ scfId, auditId: auditContext.auditId, compliance: cumple, risk: select.value });
+  if (_rvErrs.length) console.warn('[Control Model] onRiskChange validation:', _rvErrs);
 
   EvaluationRegistry.save(scfId, {
     scfId: scfId,

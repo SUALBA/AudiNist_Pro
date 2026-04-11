@@ -100,6 +100,10 @@ class="absolute w-full bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-
 <div class="text-xs text-gray-400" data-i18n="dash_compliant">Cumplidos</div>
 </div>
 <div class="bg-gray-800 p-3 rounded text-center">
+<div class="text-2xl font-bold text-cyberwarn" id="dash-partial">0</div>
+<div class="text-xs text-gray-400" data-i18n="partial_label">Parcial</div>
+</div>
+<div class="bg-gray-800 p-3 rounded text-center">
 <div class="text-2xl font-bold text-cyberevil" id="dash-noncompliant">0</div>
 <div class="text-xs text-gray-400" data-i18n="dash_noncompliant">No Cumplidos</div>
 </div>
@@ -212,6 +216,10 @@ data-i18n="import_json_btn">📂 Importar JSON
 <div class="p-4 bg-cyberbg border-2 border-cyberok rounded text-center">
 <div id="countOK" class="text-xl font-bold">0</div>
 <div class="text-xs text-gray-400" data-i18n="summary_compliant">Cumplidos ✅</div>
+</div>
+<div class="p-4 bg-cyberbg border-2 border-cyberwarn rounded text-center">
+<div id="countPartial" class="text-xl font-bold">0</div>
+<div class="text-xs text-gray-400" data-i18n="partial_label">Parcial</div>
 </div>
 <div class="p-4 bg-cyberbg border-2 border-cyberwarn rounded text-center">
 <div id="countFail" class="text-xl font-bold">0</div>
@@ -569,18 +577,20 @@ compliant: compliant
 },
 
 updateDashboard() {
-const stats = { total: 0, compliant: 0, nonCompliant: 0, highRisk: 0 };
+const stats = { total: 0, compliant: 0, partial: 0, nonCompliant: 0, highRisk: 0 };
 Object.values(this.store).forEach(control => {
 control.evaluations.forEach(ev => {
 stats.total++;
-if (ev.compliance === 'yes') stats.compliant++;
-if (ev.compliance === 'no') stats.nonCompliant++;
+if (ev.compliance === 'yes')          stats.compliant++;
+else if (ev.compliance === 'no')      stats.nonCompliant++;
+else if (ev.compliance === 'partial') stats.partial++;
 if (ev.risk === 'high') stats.highRisk++;
 });
 });
 
 document.getElementById('dash-total-controls').textContent = stats.total;
 document.getElementById('dash-compliant').textContent = stats.compliant;
+document.getElementById('dash-partial').textContent = stats.partial;
 document.getElementById('dash-noncompliant').textContent = stats.nonCompliant;
 document.getElementById('dash-high-risk').textContent = stats.highRisk;
 
@@ -594,7 +604,7 @@ percentage >= 80 ? 'text-cyberok' : percentage >= 50 ? 'text-cyberwarn' : 'text-
 }
 
 if (chartComp) {
-chartComp.data.datasets[0].data = [stats.compliant, stats.nonCompliant, stats.total - stats.compliant - stats.nonCompliant];
+chartComp.data.datasets[0].data = [stats.compliant, stats.nonCompliant, stats.partial];
 chartComp.update();
 }
 if (chartFramework) {
@@ -980,19 +990,21 @@ updateFrameworkProgressBars();
 }
 
 function updateSummary() {
-  const stats = { total: 0, compliant: 0, nonCompliant: 0, high: 0 };
+  const stats = { total: 0, compliant: 0, partial: 0, nonCompliant: 0, high: 0 };
 
   Object.values(EvaluationRegistry.store).forEach(control => {
     control.evaluations.forEach(ev => {
       stats.total++;
-      if (ev.compliance === 'yes') stats.compliant++;
-      if (ev.compliance === 'no') stats.nonCompliant++;
+      if (ev.compliance === 'yes')          stats.compliant++;
+      else if (ev.compliance === 'no')      stats.nonCompliant++;
+      else if (ev.compliance === 'partial') stats.partial++;
       if (ev.risk === 'high') stats.high++;
     });
   });
 
   document.getElementById('countTotal').textContent = stats.total;
   document.getElementById('countOK').textContent = stats.compliant;
+  document.getElementById('countPartial').textContent = stats.partial;
   document.getElementById('countFail').textContent = stats.nonCompliant;
   document.getElementById('countRisk').textContent = stats.high;
 }
@@ -1104,11 +1116,13 @@ function clearData() {
   // 🔥 RESET DASHBOARD MANUAL
   document.getElementById('dash-total-controls').textContent = 0;
   document.getElementById('dash-compliant').textContent = 0;
+  document.getElementById('dash-partial').textContent = 0;
   document.getElementById('dash-noncompliant').textContent = 0;
   document.getElementById('dash-high-risk').textContent = 0;
 
   document.getElementById('countTotal').textContent = 0;
   document.getElementById('countOK').textContent = 0;
+  document.getElementById('countPartial').textContent = 0;
   document.getElementById('countFail').textContent = 0;
   document.getElementById('countRisk').textContent = 0;
 
@@ -1678,7 +1692,7 @@ history_search_ph:'🔍 Buscar por control, empresa o auditoría...',
 search_audit_label:'🔍 Buscar Auditoría Guardada',
 search_audit_ph:'Escribe nombre de empresa o ID de auditoría...',
 dashboard_title:'📊 Dashboard Multi-Framework',
-dash_total:'Total Evaluados', dash_compliant:'Cumplidos',
+dash_total:'Total Evaluados', dash_compliant:'Cumplidos', partial_label:'Parcial',
 dash_noncompliant:'No Cumplidos', dash_high_risk:'Riesgos Altos',
 framework_progress_title:'📊 Progreso por Framework',
 summary_controls:'Controles', summary_compliant:'Cumplidos ✅',
@@ -1720,7 +1734,7 @@ history_search_ph:'🔍 Search by control, company or audit...',
 search_audit_label:'🔍 Search Saved Audit',
 search_audit_ph:'Type company name or audit ID...',
 dashboard_title:'📊 Multi-Framework Dashboard',
-dash_total:'Total Evaluated', dash_compliant:'Compliant',
+dash_total:'Total Evaluated', dash_compliant:'Compliant', partial_label:'Partial',
 dash_noncompliant:'Non-Compliant', dash_high_risk:'High Risks',
 framework_progress_title:'📊 Framework Progress',
 summary_controls:'Controls', summary_compliant:'Compliant ✅',
@@ -1762,7 +1776,7 @@ history_search_ph:'🔍 Rechercher par contrôle, entreprise ou audit...',
 search_audit_label:'🔍 Rechercher Audit Sauvegardé',
 search_audit_ph:'Nom d\'entreprise ou ID d\'audit...',
 dashboard_title:'📊 Tableau de Bord Multi-Framework',
-dash_total:'Total Évalués', dash_compliant:'Conformes',
+dash_total:'Total Évalués', dash_compliant:'Conformes', partial_label:'Partiel',
 dash_noncompliant:'Non Conformes', dash_high_risk:'Risques Élevés',
 framework_progress_title:'📊 Progression par Framework',
 summary_controls:'Contrôles', summary_compliant:'Conformes ✅',
@@ -1804,7 +1818,7 @@ history_search_ph:'🔍 Nach Kontrolle, Unternehmen oder Audit suchen...',
 search_audit_label:'🔍 Gespeicherte Prüfung suchen',
 search_audit_ph:'Unternehmensname oder Audit-ID eingeben...',
 dashboard_title:'📊 Multi-Framework Dashboard',
-dash_total:'Gesamt Bewertet', dash_compliant:'Konform',
+dash_total:'Gesamt Bewertet', dash_compliant:'Konform', partial_label:'Teilweise',
 dash_noncompliant:'Nicht Konform', dash_high_risk:'Hohe Risiken',
 framework_progress_title:'📊 Framework Fortschritt',
 summary_controls:'Kontrollen', summary_compliant:'Konform ✅',
@@ -1846,7 +1860,7 @@ history_search_ph:'🔍 Pesquisar por controle, empresa ou auditoria...',
 search_audit_label:'🔍 Pesquisar Auditoria Salva',
 search_audit_ph:'Digite o nome da empresa ou ID da auditoria...',
 dashboard_title:'📊 Dashboard Multi-Framework',
-dash_total:'Total Avaliados', dash_compliant:'Conformes',
+dash_total:'Total Avaliados', dash_compliant:'Conformes', partial_label:'Parcial',
 dash_noncompliant:'Não Conformes', dash_high_risk:'Riscos Altos',
 framework_progress_title:'📊 Progresso por Framework',
 summary_controls:'Controles', summary_compliant:'Conformes ✅',
@@ -1888,7 +1902,7 @@ history_search_ph:'🔍 البحث بالضابط أو الشركة أو الت�
 search_audit_label:'🔍 البحث في التدقيقات المحفوظة',
 search_audit_ph:'اكتب اسم الشركة أو رقم التدقيق...',
 dashboard_title:'📊 لوحة التحكم متعددة الأطر',
-dash_total:'إجمالي المقيّمين', dash_compliant:'ممتثل',
+dash_total:'إجمالي المقيّمين', dash_compliant:'ممتثل', partial_label:'جزئي',
 dash_noncompliant:'غير ممتثل', dash_high_risk:'مخاطر عالية',
 framework_progress_title:'📊 تقدم الإطار',
 summary_controls:'الضوابط', summary_compliant:'ممتثل ✅',
@@ -1930,7 +1944,7 @@ history_search_ph:'🔍 按控制、公司或审计搜索...',
 search_audit_label:'🔍 搜索已保存的审计',
 search_audit_ph:'输入公司名称或审计ID...',
 dashboard_title:'📊 多框架仪表板',
-dash_total:'总评估数', dash_compliant:'合规',
+dash_total:'总评估数', dash_compliant:'合规', partial_label:'部分',
 dash_noncompliant:'不合规', dash_high_risk:'高风险',
 framework_progress_title:'📊 框架进度',
 summary_controls:'控制项', summary_compliant:'合规 ✅',

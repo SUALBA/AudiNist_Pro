@@ -1,55 +1,66 @@
-# 🔐 AuditNIST Pro
+# 🛡️ AuditSym — AI-Assisted Cybersecurity Audit & GRC Platform
 
-> **Local-first multi-framework cybersecurity audit workspace**  
-> Built to help auditors, security teams, and compliance professionals perform structured assessments with clarity, speed, and visual insight.
+<div align="center">
 
-AuditNIST Pro is an evolving cybersecurity audit workspace that brings together **control evaluation, risk visibility, evidence tracking, reusable templates, and reporting** in a single interface.
+**A local-first, multi-framework GRC intelligence platform with AI-powered auditing, risk remediation, and continuous improvement tracking.**
 
-It currently supports:
+[![Version](https://img.shields.io/badge/version-2.0.1-blue.svg)](https://github.com/tuusuario/auditsym/releases)
+[![License](https://img.shields.io/badge/license-AGPL--3.0-green.svg)](LICENSE)
+[![Frameworks](https://img.shields.io/badge/frameworks-NIST%20%7C%20ISO%20%7C%20CIS%20%7C%20COBIT-purple.svg)](#supported-frameworks)
+[![AI Providers](https://img.shields.io/badge/AI-Local%20%26%20Cloud%20Ready-yellow.svg)](#ai-providers)
+[![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local%20First-orange.svg)](#privacy--security)
 
-- **NIST CSF 2.0**
-- **ISO 27001**
-- **CIS Controls v8**
-- **COBIT 2019**
+[🚀 Live Demo](https://tuusuario.github.io/auditsym/) · 
+[📖 Documentation](docs/) · 
+[🐛 Report Bug](https://github.com/tuusuario/auditsym/issues) · 
+[💡 Request Feature](https://github.com/tuusuario/auditsym/issues)
+
+</div>
 
 ---
-## 🤝 Collaboration
 
-AuditNIST Pro is actively developed with contributions from:
+## 👥 Core Contributors
 
-- **Susana Alba Santamaria** — Project Creator  
-- **Vandan Panwala** — Main Collaborator & Architecture Contributor  
+AuditSym is actively developed and architected by:
 
-GitHub: https://github.com/PanwalaVandan
+### 👩‍💻 Project Creator & Lead
+**Susana Alba Santamaria**  
+Cybersecurity & Audit-Focused Builder  
+ sualba.dev@gmail.com
 
-## Why this project stands out
+###  Main Collaborator & Architecture Contributor
+**Vandan Panwala**  
+Cybersecurity & Software Engineering Contributor  
+🔗 [GitHub Profile](https://github.com/PanwalaVandan)
 
-Cybersecurity frameworks are powerful, but in practice they are often:
+---
 
-- difficult to operationalize
-- fragmented across documents
-- repetitive to assess
-- hard to visualize in a clean workflow
+## 🎯 Overview
 
-**AuditNIST Pro** aims to turn that complexity into a more practical experience:
+AuditSym is a comprehensive, **local-first GRC (Governance, Risk & Compliance) intelligence platform** designed for professional auditors, security teams, and compliance officers. It transforms the complexity of cybersecurity frameworks into a practical, visual, and AI-assisted workflow.
 
-- evaluate controls
-- classify compliance
-- score risk
-- document evidence
-- reuse controls
-- export results
-- compare framework progress
+Unlike traditional cloud-based GRC tools, AuditSym ensures **absolute data privacy**. All data, AI processing, and evidence remain strictly within your local environment, making it ideal for highly regulated industries, air-gapped networks, and privacy-conscious organizations.
 
-All from a **local-first workspace**, with no backend required for the core workflow.
+### Why AuditSym?
+
+Cybersecurity frameworks are powerful, but in practice, they are often difficult to operationalize, fragmented, and repetitive to assess. AuditSym solves this by turning complexity into clarity:
+
+| The Problem | The AuditSym Solution |
+|-------------|-----------------------|
+| Cloud GRC tools expose sensitive data | **100% Local-First** — your data never leaves your browser |
+| Expensive SaaS subscriptions | **Open Source & Free** — no license fees, ever |
+| Single-framework silos | **Multi-Framework** — NIST, ISO, CIS, COBIT in one place |
+| Manual, spreadsheet-based audits | **AI-Assisted** — automated scoring, narratives, and RAG |
+| No prioritization of findings | **Priority Matrix** — Quick Wins first (Impact vs. Effort) |
+| No historical tracking | **Evolution Tracking** — year-over-year security improvement |
 
 ---
 
 ## 📸 Interface Preview
-
+### 📊 Multi-Framework Dashboard
 ### Multi-Framework Dashboard
 
-![Multi-Framework Dashboard](screenshots/dashboardRisk1.jpg)
+![Multi-Framework Dashboard](screenshots/dashboardRiskSYM..jpg)
 
 A visual overview of audit activity across frameworks, with summary metrics, compliance visibility, and risk-oriented monitoring.
 
@@ -81,7 +92,7 @@ Controls can be explored from a domain perspective, making the tool easier to us
 
 ### Framework Progress Tracking
 
-![Framework Progress](screenshots/frameworkProgress4.jpg)
+![Framework Progress](screenshots/frameworkprogreSYM.jpg)
 
 Progress bars make it easier to see evaluation coverage across NIST, ISO, CIS, and COBIT at a glance.
 
@@ -111,227 +122,157 @@ AuditNIST Pro is designed to support structured reporting and a cleaner audit ou
 
 ---
 
-## ✨ Current Features
+###  Remediation Hub & Priority Matrix
+![Priority Matrix](screenshots/HALLAZGOSyREMEDIACION.jpg)
+*Automatically classifies findings into Quick Wins, Critical, Opportunities, and Strategic based on Impact vs. Effort.*
 
-### Multi-framework support
-
-- NIST CSF 2.0
-- ISO 27001
-- CIS Controls v8
-- COBIT 2019
-
-### Audit workspace
-
-- Control evaluation
-- Compliance classification
-- Risk rating
-- Auditor notes
-- Evidence tracking
-- Suggested controls
-- Reusable templates
-
-### Dashboard and analytics
-
-- Compliance overview
-- Risk visualization
-- Framework progress
-- Multi-framework comparison
-- Audit metrics
-
-### Reporting and portability
-
-- PDF export
-- JSON export/import
-- Local audit history
-- Structured metadata handling
-
-### Local-first design
-
-- No backend required
-- Standalone usage possible
-- LocalStorage persistence
-- Lightweight deployment model
+### 🤖 AI-Assisted Finding Detail
+![Finding Detail](screenshots/historicalEvolutionSYM.jpg)
+*Each finding includes AI-assisted remediation guidance and prioritization, evidence suggestions, and complexity/effort analysis.*
 
 ---
 
-## 🎯 Who this is for
+## ✨ Key Features
 
-### Auditors and compliance professionals
+###  Audit Engine (`auditnist-local.html`)
+- **Multi-Framework Support**: Evaluate controls against NIST CSF 2.0, ISO 27001, CIS Controls v8, and COBIT 2019 simultaneously.
+- **AI Assessment**: Risk-weighted scoring with maturity model and AI-generated executive narrative.
+- **Local RAG**: Semantic search and analysis of PDF policies and procedures (requires local Python server).
+- **5 AI Providers**: Ollama (Local), OpenAI, Anthropic, Groq, OpenRouter.
+- **Deterministic Fallback**: Works offline with a built-in scoring engine when AI is unavailable.
 
-- Cybersecurity auditors
-- Internal audit teams
-- GRC professionals
-- Compliance specialists
+### 🛠️ Remediation Hub (`remediation-hub.html`)
+- **Priority Matrix**: Automatic classification of findings (Quick Wins, Critical, Opportunities, Strategic).
+- **Finding Lifecycle**: Open → Assigned → In Progress → Pending Validation → Closed.
+- **Risk Acceptance Workflow**: Formal approval with approver, justification, and review date (ISO 27001 / SOX compliant).
+- **AI Remediation Copilot (initial version)**: AI-generated recommendations and evidence suggestions per finding.
+- **Historical Evolution Dashboard**: Year-over-year security posture tracking and continuous improvement.
 
-### Security teams
-
-- SOC analysts
-- Security engineers
-- Risk analysts
-- Security consultants
-
-### Contributors
-
-- Frontend developers
-- Security-minded builders
-- Open-source collaborators
-- People interested in audit tooling, compliance UX, and security product ideas
+###  Platform & Privacy
+- **7 Languages**: ES, EN, FR, DE, PT, AR, ZH.
+- **Local-First Design**: No backend required. All data persists in browser LocalStorage.
+- **Offline Ready**: Fully functional without an internet connection.
+- **Export/Import**: JSON bidirectional sync between Audit and Remediation modules, plus PDF report generation.
 
 ---
 
-## 🧠 Project Vision
+## 🏗️ Architecture & Tech Stack
 
-AuditNIST Pro is evolving toward a more structured and practical cybersecurity audit platform focused on:
+AuditSym is evolving toward a modular, scalable architecture built around:
+- **Audit Engine** & **Framework Adapters**
+- **Evaluation Registry** & **Template Library**
+- **Reporting Engine** & **AI Layer**
 
-- multi-framework assessments
-- reusable audit logic
-- cross-framework thinking
-- better visualization of compliance and risk
-- more efficient audit documentation
-- future AI-assisted audit workflows
+**Tech Stack:**
+- **Frontend**: HTML5, CSS3 (Tailwind CSS / Custom), JavaScript (ES6+)
+- **Visualization**: Chart.js
+- **Reporting**: jsPDF, FileSaver.js
+- **Storage**: Browser LocalStorage (Local-first)
+- **AI Integration**: REST API calls to external providers / Local Ollama
+- **RAG**: Optional local Python server (`rag/server.py`) for PDF analysis
 
-This is **not yet a finished product**, but it is already more than a simple demo or checklist. It is an active workspace moving toward a clearer product direction.
+---
+
+## 🛣️ Roadmap
+
+### ✅ Phase 1 — Foundation (Completed)
+- [x] Multi-framework support (NIST, ISO, CIS, COBIT)
+- [x] AI Assessment with 5 providers
+- [x] Local RAG for PDF analysis
+- [x] Remediation Hub with Priority Matrix
+- [x] Risk Acceptance workflow
+- [x] 7-language internationalization
+
+### 🔵 Phase 2 —  Audit Lifecycle (In Progress)
+
+✔ Initial Remediation Hub
+✔ Historical Evolution
+✔ Risk Acceptance Workflow
+
+Next:
+- [ ] Findings
+- [ ] Management Response
+- [ ] Closure
+
+### 🟣 Phase 3 — Enterprise & Scale (Future)
+- [ ] Collaborative auditing (multi-user sync)
+- [ ] Jira / ServiceNow integrations
+- [ ] Professional report templates
+- [ ] AuditSym Cloud (optional hosted version)
 
 ---
 
 ## 🤝 How to Contribute
 
-AuditNIST Pro welcomes contributors at different levels.
-
-Whether you want to improve the interface, refine the logic, or help shape the architecture, there is room to contribute.
+AuditSym welcomes contributors at all levels. Whether you want to improve the interface, refine the logic, or help shape the architecture, there is room to contribute.
 
 ### 🟢 Level 1 — Quick Contributions
-
-Good starting tasks:
-
-- [ ] Improve UI spacing
-- [ ] Improve control card layout
-- [ ] Improve dashboard styling
-- [ ] Improve responsiveness
-- [ ] Improve chart readability
-- [ ] Improve template library UI
-- [ ] Improve accessibility
+Good starting tasks for UI/UX improvements:
+- [ ] Improve UI spacing and control card layout
+- [ ] Improve dashboard styling and chart readability
+- [ ] Improve responsiveness and accessibility
 - [ ] Improve dark mode consistency
 
 ### 🔵 Level 2 — Core Improvements
-
-More technical contributions:
-
-- [ ] Refactor Audit Engine
-- [ ] Improve control data model
-- [ ] Improve evaluation persistence
-- [ ] Improve dashboard calculations
-- [ ] Improve import/export logic
-- [ ] Improve state management
-- [ ] Improve performance with large audits
+More technical contributions for the audit logic:
+- [ ] Refactor Audit Engine and control data model
+- [ ] Improve evaluation persistence and import/export logic
+- [ ] Improve state management and performance with large audits
 
 ### 🟣 Level 3 — Advanced Ideas
-
-Future-oriented contributions:
-
+Future-oriented contributions for the platform:
 - [ ] Cross-framework mapping engine
-- [ ] Maturity scoring model
-- [ ] Risk scoring engine
-- [ ] Control normalization
-- [ ] Audit recommendation engine
-- [ ] AI audit assistant
+- [ ] Advanced risk scoring engine
+- [ ] AI audit assistant improvements
 
 ---
 
-## 🏗️ Architecture Direction
-
-AuditNIST Pro is evolving toward a structure built around:
-
-- Audit Engine
-- Framework Adapters
-- Evaluation Registry
-- Template Library
-- Reporting Engine
-- AI Layer
-
-This direction makes the project easier to grow and easier for contributors to work on independently.
-
----
-
-## 🛣️ Roadmap
-
-### Phase 1 — Foundation
-- Multi-framework support
-- Dashboard
-- Audit controls
-- Reporting
-- Local persistence
-
-### Phase 2 — Structure
-- Cleaner modular architecture
-- Better control model
-- Improved persistence and audit flow
-- Better contributor experience
-
-### Phase 3 — Intelligence
-- Cross-framework mapping
-- Risk scoring improvements
-- Smarter suggestions
-- AI-assisted audit workflows
-
----
-
-## 🛠️ Tech Stack
-
-- HTML
-- Tailwind CSS
-- JavaScript
-- Chart.js
-- jsPDF
-- FileSaver.js
-- LocalStorage
-
----
-
-## 🛣️ Roadmap
-
-See full roadmap:  
-📄 ROADMAP.md
-
----
 ## 🚀 Running the Project
 
-Open directly:
+**Option 1: Direct Open**
+Simply open `auditnist-local.html` or `remediation-hub.html` in your browser.
 
-```bash
-open auditnist-local.html
-
-Or run a local server:
+**Option 2: Local Server (Recommended)**
 
 python -m http.server 8080
-📌 Project Status
+ Then visit http://localhost:8080
+ 
+ 
+**Option 3: Local RAG Server (Optional)**
+    123
+    License
 
-Active development — evolving toward a structured cybersecurity audit workspace.
-
-AuditNIST Pro is currently in a strong pre-product phase: usable, visible, and growing.
-
-
-
-
-# 👥 Core Contributors
-
-### 👩‍💻 Author
-**Susana Alba Santamaria**  
-Cybersecurity & Audit-Focused Builder  
-📧 sualba.dev@gmail.com
-
-### 🤝 Main Collaborator
-**Vandan Panwala**  
-Cybersecurity & Software Engineering Contributor  
-🔗 https://github.com/PanwalaVandan
-
-License
-
-MIT License
-
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).
+See the LICENSE file for details.
+What this means:
+✅ Free to use, modify, and distribute.
+✅ Can be used commercially.
+️ Modifications must also be open source (AGPL).
+⚠️ Network use requires sharing source code.
+This license protects the open-source nature of AuditSym while allowing commercial consulting and support services.
 ⭐ Support the Project
-If you find this project useful:
+If you find AuditSym useful: Give the repository a star ⭐
+Open issues for improvements or bugs
+Contribute new framework adapters or translations
+Share your feedback and use cases
+AuditSym is being built to make cybersecurity audits more structured, intelligent, and privacy-first.
 
-give the repository a star ⭐
-open issues for improvements
-contribute new framework adapters
+We believe an audit should not end with a report — it should drive continuous improvement.
+
+<div align="center">
+
+<img src="screenshots/logo_AuditSYM.png" width="220" alt="AuditSym Logo">
+
+**AuditSym**
+
+*AI-Assisted Cybersecurity Audit & GRC Platform*
+
+**Plan • Assess • Report • Remediate • Improve**
+
+
+
+</div>
+<div align="center">
+
+⬆ Back to top
+</div>

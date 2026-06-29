@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AuditSym · Plataforma GRC con IA Local</title>
+    <meta name="description" content="AuditSym es una plataforma GRC multi-framework con IA local. Audita NIST, ISO, CIS y COBIT sin que tus datos salgan de tu máquina." />
+
+    <style>
+        /* ===== ROOT ===== */
+        :root {
+            --bg: #07111f;
+            --panel: #0f1b2d;
+            --border: rgba(148, 163, 184, 0.12);
+            --text: #e5edf7;
+            --muted: #93a4b8;
+            --blue: #38bdf8;
+            --green: #22c55e;
+            --purple: #a78bfa;
+            --shadow: 0 20px 55px rgba(0, 0, 0, .5);
+            --radius: 16px;
+            --transition: all .3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--blue); border-radius: 8px; }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(7, 17, 31, .88);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text);
+        }
+        /* ─── Logo-escudo en el header ─── */
+    
+     /* ─── Brand / Logo header ─── */
+        .header .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .header .brand .logo-shield {
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header .brand .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            transition: var(--transition);
+        }
+
+        .header .brand:hover .logo-img {
+            transform: scale(1.08);
+            filter:
+                drop-shadow(0 0 6px #38bdf8)
+                drop-shadow(0 0 18px #38bdf8)
+                drop-shadow(0 0 30px rgba(167,139,250,.55));
+        }
+
+        .brand-text h2 {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-text span {
+            display: block;
+            margin-top: 3px;
+            font-size: .68rem;
+            color: var(--muted);
+            letter-spacing: .8px;
+            white-space: nowrap;
+        }
+
+        /* ===== HERO SPLASH ===== */
+        .hero-splash {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 100px 24px 50px;
+            overflow: hidden;
+            background: radial-gradient(circle at 30% 30%, rgba(56, 189, 248, .05), transparent 50%),
+                        radial-gradient(circle at 70% 70%, rgba(167, 139, 250, .04), transparent 50%),
+                        var(--bg);
+        }
+        /* Enlace que envuelve el escudo grande */
+        .shield-link {
+            display: block;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .shield-link:hover .shield {
+            filter: drop-shadow(0 0 100px rgba(56, 189, 248, .4));
+            transform: scale(1.02);
+        }
+
+        /* Haces de luz */
+        .light-beams {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .light-beam {
+            position: absolute;
+            top: -20%;
+            width: 60%;
+            height: 140%;
+            background: linear-gradient(180deg, transparent, rgba(56,189,248,.03), rgba(167,139,250,.05), rgba(56,189,248,.03), transparent);
+            transform-origin: center center;
+            animation: beamSweep 12s ease-in-out infinite alternate;
+            filter: blur(40px);
+        }
+        .light-beam:nth-child(1) { left: -10%; animation-duration: 14s; }
+        .light-beam:nth-child(2) { left: 20%; animation-duration: 16s; animation-delay: 2s; }
+        .light-beam:nth-child(3) { left: 50%; animation-duration: 18s; animation-delay: 4s; }
+        .light-beam:nth-child(4) { left: 75%; animation-duration: 15s; animation-delay: 1s; }
+        @keyframes beamSweep {
+            0% { transform: rotate(-15deg) scale(1); opacity: 0.3; }
+            25% { opacity: 0.7; }
+            50% { transform: rotate(10deg) scale(1.2); opacity: 0.5; }
+            75% { opacity: 0.8; }
+            100% { transform: rotate(-10deg) scale(0.9); opacity: 0.3; }
+        }
+
+        /* Partículas */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(56, 189, 248, .3);
+            border-radius: 50%;
+            animation: particleFloat 20s linear infinite;
+        }
+        .particle:nth-child(1) { top: 10%; left: 20%; animation-duration: 22s; }
+        .particle:nth-child(2) { top: 30%; left: 80%; animation-duration: 18s; animation-delay: 3s; width: 4px; height: 4px; }
+        .particle:nth-child(3) { top: 60%; left: 10%; animation-duration: 25s; animation-delay: 5s; background: rgba(167, 139, 250, .25); }
+        .particle:nth-child(4) { top: 80%; left: 70%; animation-duration: 20s; animation-delay: 2s; width: 2px; height: 2px; }
+        .particle:nth-child(5) { top: 40%; left: 50%; animation-duration: 28s; animation-delay: 7s; background: rgba(167, 139, 250, .2); }
+        .particle:nth-child(6) { top: 15%; left: 60%; animation-duration: 16s; animation-delay: 4s; }
+        .particle:nth-child(7) { top: 70%; left: 40%; animation-duration: 24s; animation-delay: 1s; background: rgba(56, 189, 248, .15); }
+        .particle:nth-child(8) { top: 90%; left: 90%; animation-duration: 19s; animation-delay: 6s; width: 5px; height: 5px; }
+        @keyframes particleFloat {
+            0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.2; }
+            25% { opacity: 0.8; }
+            50% { transform: translateY(-200px) translateX(50px) scale(1.5); opacity: 0.5; }
+            75% { opacity: 0.9; }
+            100% { transform: translateY(-400px) translateX(-30px) scale(0.5); opacity: 0; }
+        }
+        .header .brand:hover .logo-img{
+    transform:scale(1.08);
+
+    filter:
+        drop-shadow(0 0 6px #38bdf8)
+        drop-shadow(0 0 18px #38bdf8)
+        drop-shadow(0 0 30px rgba(167,139,250,.55));
+}
+
+        /* ===== ESCUDO GRANDE (hero) ===== */
+        .shield-container {
+            position: relative;
+            z-index: 2;
+            animation: shieldAppear 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            opacity: 0;
+            transform: scale(0.7) translateY(40px);
+        }
+        @keyframes shieldAppear {
+            0% { opacity: 0; transform: scale(0.7) translateY(40px); }
+            60% { opacity: 1; transform: scale(1.04) translateY(-4px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .shield {
+            width: 220px;
+            height: 260px;
+            margin: 0 auto;
+            position: relative;
+            filter: drop-shadow(0 0 80px rgba(56, 189, 248, .2));
+            animation: shieldFloat 5s ease-in-out infinite;
+            transition: var(--transition);
+        }
+        @keyframes shieldFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+        .shield svg { width: 100%; height: 100%; display: block; }
+
+        /* ===== RESTO DE SECCIONES ===== */
+        .shield-title {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            margin-top: 28px;
+            animation: titleAppear 1s ease-out 0.8s forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        @keyframes titleAppear {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .shield-title h1 {
+            font-size: 4.2rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 80px rgba(56, 189, 248, .12);
+        }
+        .shield-title .tagline {
+            font-size: 1.15rem;
+            color: var(--muted);
+            letter-spacing: 2px;
+            margin-top: 4px;
+            font-weight: 300;
+        }
+        .shield-title .tagline strong { color: var(--text); font-weight: 600; }
+
+        .shield-badges {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            animation: titleAppear 1s ease-out 1s forwards;
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        .shield-badges .badge {
+            background: rgba(56, 189, 248, .07);
+            border: 1px solid rgba(56, 189, 248, .10);
+            border-radius: 999px;
+            padding: 5px 16px;
+            font-size: .75rem;
+            color: var(--muted);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .shield-badges .badge:hover {
+            border-color: rgba(56, 189, 248, .25);
+            color: var(--text);
+        }
+
+        .shield-actions {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 32px;
+            animation: titleAppear 1s ease-out 1.2s forwards;
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        .shield-actions .btn-audit {
+            background: var(--blue);
+            color: #07111f;
+            border: 0;
+            padding: 15px 36px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 10px 35px rgba(56, 189, 248, .25);
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            min-width: 180px;
+        }
+        .shield-actions .btn-audit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 45px rgba(56, 189, 248, .35);
+        }
+        .shield-actions .btn-audit .btn-main { font-size: 1.05rem; display: flex; align-items: center; gap: 10px; }
+        .shield-actions .btn-audit .btn-sub { font-size: .68rem; font-weight: 400; opacity: 0.7; }
+        .shield-actions .btn-remediation {
+            background: var(--green);
+            color: #07111f;
+            border: 0;
+            padding: 15px 36px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 10px 35px rgba(34, 197, 94, .2);
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            min-width: 180px;
+        }
+        .shield-actions .btn-remediation:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 45px rgba(34, 197, 94, .3);
+        }
+        .shield-actions .btn-remediation .btn-main { font-size: 1.05rem; display: flex; align-items: center; gap: 10px; }
+        .shield-actions .btn-remediation .btn-sub { font-size: .68rem; font-weight: 400; opacity: 0.7; }
+        .shield-actions .btn-secondary {
+            background: rgba(148, 163, 184, .08);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 15px 28px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            min-width: 140px;
+        }
+        .shield-actions .btn-secondary:hover {
+            background: rgba(148, 163, 184, .16);
+            transform: translateY(-3px);
+        }
+        .shield-actions .btn-secondary .btn-sub { font-size: .68rem; font-weight: 400; opacity: 0.6; }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            animation: bounceDown 2.5s ease-in-out infinite;
+            opacity: 0.35;
+            color: var(--muted);
+            font-size: .7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+        .scroll-indicator .arrow { font-size: 1.2rem; animation: arrowBounce 1.8s ease-in-out infinite; }
+        @keyframes bounceDown {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(6px); }
+        }
+        @keyframes arrowBounce {
+            0%, 100% { transform: translateY(0); opacity: 0.3; }
+            50% { transform: translateY(6px); opacity: 1; }
+        }
+
+        /* ===== SECCIONES ===== */
+        .section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 40px;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .section-header h3 { font-size: 2.2rem; font-weight: 700; }
+        .section-header p { color: var(--muted); font-size: 1.05rem; max-width: 600px; margin: 12px auto 0; }
+
+        .flow-complete {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .flow-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .flow-card:hover {
+            border-color: rgba(56, 189, 248, .25);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .3);
+        }
+        .flow-card .icon { font-size: 3rem; margin-bottom: 12px; display: block; }
+        .flow-card h4 { font-size: 1.2rem; margin-bottom: 6px; }
+        .flow-card p { color: var(--muted); font-size: .9rem; }
+        .flow-card .flow-link {
+            display: inline-block;
+            margin-top: 14px;
+            color: var(--blue);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: .9rem;
+            transition: var(--transition);
+        }
+        .flow-card .flow-link:hover { color: var(--text); }
+        .flow-card .flow-link-remediation { color: var(--green); }
+        .flow-card .flow-link-remediation:hover { color: var(--text); }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        .feature-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 24px;
+            transition: var(--transition);
+        }
+        .feature-card:hover {
+            border-color: rgba(56, 189, 248, .25);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .3);
+        }
+        .feature-card .icon { font-size: 2.2rem; margin-bottom: 12px; display: block; }
+        .feature-card h4 { font-size: 1.05rem; margin-bottom: 6px; }
+        .feature-card p { color: var(--muted); font-size: .88rem; }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+            font-size: .8rem;
+            border-top: 1px solid var(--border);
+        }
+        .footer a { color: var(--blue); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .flow-complete { grid-template-columns: 1fr 1fr; }
+            .features-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .header { padding: 0 16px; height: auto; flex-wrap: wrap; gap: 8px; padding: 10px 16px; }
+            .header .brand h1 { font-size: 1rem; }
+            .header .brand span { display: none; }
+            .header .brand .logo-shield { width: 48px; height: 48px; }
+            .brand-text h2 { font-size: 1.05rem; }
+            .brand-text span { display: none; }
+            .header nav { gap: 10px; flex-wrap: wrap; }
+            .header nav a { font-size: .75rem; }
+            .header .btn-start { padding: 6px 14px; font-size: .7rem; }
+            .shield { width: 170px; height: 200px; }
+            .shield-title h1 { font-size: 2.8rem; }
+            .shield-title .tagline { font-size: 1rem; }
+            .shield-actions { flex-direction: column; align-items: center; }
+            .shield-actions .btn-audit,
+            .shield-actions .btn-remediation,
+            .shield-actions .btn-secondary { width: 100%; max-width: 280px; }
+            .flow-complete { grid-template-columns: 1fr; }
+            .features-grid { grid-template-columns: 1fr; }
+            .section { padding: 50px 20px; }
+            .section-header h3 { font-size: 1.8rem; }
+            .light-beam { display: none; }
+        }
+        @media (max-width: 480px) {
+            .header .brand .logo-shield { width: 42px; height: 42px; }
+            .shield { width: 140px; height: 165px; }
+            .shield-title h1 { font-size: 2.2rem; }
+            .shield-title .tagline { font-size: .85rem; }
+            .shield-badges .badge { font-size: .65rem; padding: 4px 12px; }
+            .header .brand .logo-shield { width: 34px; height: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+    <a href="auditnist-local.html" class="brand">
+
+        <div class="logo-shield">
+            <img
+                src="/screenshots/logo_AuditSYM.png"
+                alt="AuditSym Logo"
+                class="logo-img">
+        </div>
+
+        <div class="brand-text">
+            <h2>AuditSym</h2>
+            <span>AI-Powered GRC Platform</span>
+        </div>
+
+    </a>
+                <nav>
+            <a href="#about" data-i18n="nav_about">Sobre</a>
+            <a href="#features" data-i18n="nav_features">Características</a>
+            <select class="lang-selector" id="langSelector" onchange="setLanguage(this.value)">
+                <option value="es">🇪🇸 ES</option>
+                <option value="en">🇬🇧 EN</option>
+                <option value="fr">🇫🇷 FR</option>
+                <option value="de">🇩🇪 DE</option>
+                <option value="pt">🇵🇹 PT</option>
+            </select>
+            <a href="auditnist-local.html" class="btn-start" data-i18n="btn_start">🚀 Empezar</a>
+        </nav>
+    </header>
+
+    <!-- ===== HERO SPLASH ===== -->
+    <section class="hero-splash" id="hero">
+
+        <!-- Haces de luz -->
+        <div class="light-beams">
+            <div class="light-beam"></div>
+            <div class="light-beam"></div>
+            <div class="light-beam"></div>
+            <div class="light-beam"></div>
+        </div>
+
+        <!-- Partículas -->
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+
+        <!-- Escudo grande (clicable) -->
+        <a href="auditnist-local.html" class="shield-link">
+            <div class="shield-container">
+                <div class="shield">
+                    <svg viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="shieldGrad" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.95"/>
+                                <stop offset="50%" stop-color="#6366f1" stop-opacity="0.98"/>
+                                <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.95"/>
+                            </linearGradient>
+                            <linearGradient id="shieldInner" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#0f1b2d" stop-opacity="0.85"/>
+                                <stop offset="100%" stop-color="#07111f" stop-opacity="0.95"/>
+                            </linearGradient>
+                            <filter id="glowStrong">
+                                <feGaussianBlur stdDeviation="12" result="blur"/>
+                                <feMerge>
+                                    <feMergeNode in="blur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="4" result="blur"/>
+                                <feMerge>
+                                    <feMergeNode in="blur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Resplandor exterior -->
+                        <path d="M100 8 L16 42 L16 108 C16 160 55 192 100 204 C145 192 184 160 184 108 L184 42 L100 8Z"
+                              fill="url(#shieldGrad)" opacity="0.12" filter="url(#glowStrong)">
+                            <animate attributeName="opacity" values="0.08;0.22;0.08" dur="3s" repeatCount="indefinite"/>
+                        </path>
+
+                        <!-- Cuerpo del escudo -->
+                        <path d="M100 12 L20 44 L20 106 C20 156 57 186 100 198 C143 186 180 156 180 106 L180 44 L100 12Z"
+                              fill="url(#shieldGrad)" stroke="#38bdf8" stroke-width="2" filter="url(#glow)"/>
+
+                        <!-- Interior -->
+                        <path d="M100 22 L32 50 L32 102 C32 146 63 173 100 184 C137 173 168 146 168 102 L168 50 L100 22Z"
+                              fill="url(#shieldInner)" stroke="rgba(56, 189, 248, 0.12)" stroke-width="1"/>
+
+                        <!-- Laberinto interno animado -->
+                        <path d="M50 60 L62 60 L62 72 L74 72 L74 60 L86 60"
+                              stroke="rgba(56, 189, 248, 0.2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+                            <animate attributeName="stroke-opacity" values="0.1;0.45;0.1" dur="4s" repeatCount="indefinite"/>
+                        </path>
+                        <path d="M114 60 L126 60 L126 72 L138 72 L138 60 L150 60"
+                              stroke="rgba(167, 139, 250, 0.2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+                            <animate attributeName="stroke-opacity" values="0.1;0.45;0.1" dur="4.5s" repeatCount="indefinite" begin="1s"/>
+                        </path>
+                        <path d="M70 86 L94 86 L94 98 L106 98 L106 86 L130 86"
+                              stroke="rgba(56, 189, 248, 0.15)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 4">
+                            <animate attributeName="stroke-dashoffset" values="0;100" dur="6s" repeatCount="indefinite"/>
+                        </path>
+                        <path d="M56 114 L80 114 L80 126 L100 126 L100 114 L120 114 L120 126 L144 126"
+                              stroke="rgba(167, 139, 250, 0.15)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+                            <animate attributeName="stroke-opacity" values="0.05;0.35;0.05" dur="5s" repeatCount="indefinite" begin="2s"/>
+                        </path>
+                        <path d="M62 72 L62 86 L70 86"
+                              stroke="rgba(56, 189, 248, 0.12)" stroke-width="1" stroke-linecap="round">
+                            <animate attributeName="stroke-opacity" values="0.05;0.3;0.05" dur="3.5s" repeatCount="indefinite" begin="0.5s"/>
+                        </path>
+                        <path d="M138 72 L138 86 L130 86"
+                              stroke="rgba(167, 139, 250, 0.12)" stroke-width="1" stroke-linecap="round">
+                            <animate attributeName="stroke-opacity" values="0.05;0.3;0.05" dur="3.5s" repeatCount="indefinite" begin="1.5s"/>
+                        </path>
+
+                        <!-- Símbolo interior: escudo + check -->
+                        <path d="M100 64 L78 82 L78 118 C78 142 88 154 100 160 C112 154 122 142 122 118 L122 82 L100 64Z"
+                              fill="rgba(56, 189, 248, 0.05)" stroke="rgba(56, 189, 248, 0.15)" stroke-width="1.2" filter="url(#glow)"/>
+                        <path d="M86 106 L96 118 L114 98"
+                              stroke="#22c55e" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+                            <animate attributeName="stroke-dasharray" values="0 50;50 0" dur="1.8s" repeatCount="indefinite" begin="0.5s"/>
+                            <animate attributeName="opacity" values="0.3;1;0.3" dur="2.5s" repeatCount="indefinite"/>
+                        </path>
+
+                        <!-- Línea decorativa inferior -->
+                        <line x1="56" y1="152" x2="144" y2="152"
+                              stroke="rgba(56, 189, 248, 0.1)" stroke-width="1" stroke-dasharray="8 6">
+                            <animate attributeName="stroke-dashoffset" values="0;100" dur="6s" repeatCount="indefinite"/>
+                        </line>
+
+                        <!-- Puntos nodo -->
+                        <circle cx="62" cy="60" r="3" fill="rgba(56, 189, 248, 0.25)">
+                            <animate attributeName="r" values="2;4.5;2" dur="2s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="138" cy="60" r="3" fill="rgba(167, 139, 250, 0.25)">
+                            <animate attributeName="r" values="2;4.5;2" dur="2.5s" repeatCount="indefinite" begin="1s"/>
+                            <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2.5s" repeatCount="indefinite" begin="1s"/>
+                        </circle>
+                        <circle cx="100" cy="126" r="3" fill="rgba(56, 189, 248, 0.2)">
+                            <animate attributeName="r" values="2;4;2" dur="3s" repeatCount="indefinite" begin="1.5s"/>
+                            <animate attributeName="opacity" values="0.2;0.5;0.2" dur="3s" repeatCount="indefinite" begin="1.5s"/>
+                        </circle>
+                        <circle cx="144" cy="114" r="3" fill="rgba(167, 139, 250, 0.2)">
+                            <animate attributeName="r" values="2;4;2" dur="2.8s" repeatCount="indefinite" begin="2s"/>
+                            <animate attributeName="opacity" values="0.2;0.5;0.2" dur="2.8s" repeatCount="indefinite" begin="2s"/>
+                        </circle>
+
+                        <!-- Destello superior -->
+                        <path d="M86 26 L94 38 L100 26 L106 38 L114 26"
+                              stroke="rgba(56, 189, 248, 0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <animate attributeName="opacity" values="0.1;0.7;0.1" dur="2s" repeatCount="indefinite"/>
+                        </path>
+
+                        <!-- Refuerzos laterales -->
+                        <path d="M28 50 L32 48 L32 56 L28 54Z" fill="rgba(56, 189, 248, 0.1)"/>
+                        <path d="M172 50 L168 48 L168 56 L172 54Z" fill="rgba(167, 139, 250, 0.1)"/>
+                        <path d="M90 192 L100 202 L110 192" stroke="rgba(56, 189, 248, 0.15)" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+
+        <!-- Título -->
+        <div class="shield-title">
+            <h1>AuditSym</h1>
+            <p class="tagline" data-i18n="tagline"><strong>AI‑assisted</strong> cybersecurity audit platform</p>
+        </div>
+
+        <!-- Badges -->
+        <div class="shield-badges">
+            <span class="badge">🤖 <span data-i18n="badge_ai">IA Local</span></span>
+            <span class="badge">🔒 <span data-i18n="badge_secure">Datos seguros</span></span>
+            <span class="badge">🌍 <span data-i18n="badge_langs">7 idiomas</span></span>
+            <span class="badge">🆓 <span data-i18n="badge_opensource">Open Source</span></span>
+            <span class="badge">🛡️ <span data-i18n="badge_frameworks">4 Frameworks</span></span>
+        </div>
+
+        <!-- Botones -->
+        <div class="shield-actions">
+            <a href="auditnist-local.html" class="btn-audit">
+                <span class="btn-main">🚀 <span data-i18n="btn_audit">Auditoría</span></span>
+                <span class="btn-sub" data-i18n="btn_audit_sub">Evalúa NIST, ISO, CIS, COBIT</span>
+            </a>
+            <a href="remediation-hub.html" class="btn-remediation">
+                <span class="btn-main">🛠️ <span data-i18n="btn_remediation">Remediación</span></span>
+                <span class="btn-sub" data-i18n="btn_remediation_sub">Gestiona hallazgos y cierra</span>
+            </a>
+            <a href="#about" class="btn-secondary">
+                <span data-i18n="btn_learn">📖 Saber más</span>
+                <span class="btn-sub" data-i18n="btn_learn_sub">Descubre el flujo</span>
+            </a>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="scroll-indicator" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">
+            <span data-i18n="scroll_desc">Descubre cómo funciona</span>
+            <span class="arrow">⌄</span>
+        </div>
+    </section>
+
+    <!-- ===== SECCIÓN: FLUJO COMPLETO ===== -->
+    <section class="section" id="about">
+        <div class="section-header">
+            <h3 data-i18n="flow_title">El flujo completo de Auditoría</h3>
+            <p data-i18n="flow_sub">AuditSym cubre todo el ciclo de vida: desde la evaluación hasta la remediación y la mejora continua.</p>
+        </div>
+        <div class="flow-complete">
+            <div class="flow-card">
+                <span class="icon">📋</span>
+                <h4 data-i18n="flow1_title">1. Auditoría</h4>
+                <p data-i18n="flow1_desc">Evalúa controles contra NIST, ISO, CIS o COBIT. Asigna riesgos, documenta evidencias y genera hallazgos.</p>
+                <a href="auditnist-local.html" class="flow-link" data-i18n="flow1_link">→ Ir a Auditoría</a>
+            </div>
+            <div class="flow-card">
+                <span class="icon">🛠️</span>
+                <h4 data-i18n="flow2_title">2. Remediación</h4>
+                <p data-i18n="flow2_desc">La empresa recibe los hallazgos, prioriza (Quick Wins), asigna responsables, sube evidencias y cierra.</p>
+                <a href="remediation-hub.html" class="flow-link flow-link-remediation" data-i18n="flow2_link">→ Ir a Remediación</a>
+            </div>
+            <div class="flow-card">
+                <span class="icon">📈</span>
+                <h4 data-i18n="flow3_title">3. Mejora Continua</h4>
+                <p data-i18n="flow3_desc">Visualiza la evolución año a año. Demuestra la mejora de la seguridad con datos históricos.</p>
+                <a href="#features" class="flow-link" data-i18n="flow3_link">→ Descubrir más</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SECCIÓN: FEATURES ===== -->
+    <section class="section" id="features">
+        <div class="section-header">
+            <h3 data-i18n="features_title">¿Por qué AuditSym?</h3>
+            <p data-i18n="features_sub">Construido para auditores que necesitan claridad, no complejidad.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="icon">🛡️</div>
+                <h4 data-i18n="f1_title">Multi-Framework</h4>
+                <p data-i18n="f1_desc">NIST CSF 2.0, ISO 27001, CIS Controls v8, COBIT 2019 — todos mapeados al Secure Controls Framework.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🤖</div>
+                <h4 data-i18n="f2_title">IA Local</h4>
+                <p data-i18n="f2_desc">Toda la IA corre localmente. Ningún dato sale de tu máquina. Compatible con Ollama, OpenAI o Groq.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">📊</div>
+                <h4 data-i18n="f3_title">Matriz de Priorización</h4>
+                <p data-i18n="f3_desc">Quick Wins primero — mayor impacto, más fáciles de resolver. Priorización visual para mejores decisiones.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">📈</div>
+                <h4 data-i18n="f4_title">Evolución Histórica</h4>
+                <p data-i18n="f4_desc">Visualiza la mejora de la seguridad año tras año. Demuestra la mejora continua a los stakeholders.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🌍</div>
+                <h4 data-i18n="f5_title">7 Idiomas</h4>
+                <p data-i18n="f5_desc">ES, EN, FR, DE, PT, AR, ZH — construido para equipos globales y clientes internacionales.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🔒</div>
+                <h4 data-i18n="f6_title">Local First</h4>
+                <p data-i18n="f6_desc">Todos los datos quedan en tu navegador. Exporta a JSON, importa cuando necesites. Sin nube, sin suscripción.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <p data-i18n="footer_text">© 2026 AuditSym — Hecho con ❤️ para auditores de seguridad. Todos los datos quedan en local.</p>
+        <p style="margin-top: 8px; font-size: .75rem;">
+            <a href="auditnist-local.html" data-i18n="footer_audit">Auditoría</a> ·
+            <a href="remediation-hub.html" data-i18n="footer_remediation">Remediación</a> ·
+            <a href="https://github.com/SUALBA/AudiNist_Pro" target="_blank">GitHub</a>
+        </p>
+    </footer>
+
+    <!-- ===== SCRIPT MULTI-IDIOMA ===== -->
+    <script>
+        // ────────────────────────────────────────────────
+        // 🌍 TRADUCCIONES (ES, EN, FR, DE, PT)
+        // ────────────────────────────────────────────────
+        const translations = {
+            es: {
+                nav_about: 'Sobre',
+                nav_features: 'Características',
+                btn_start: '🚀 Empezar',
+                tagline: '<strong>AI‑assisted</strong> cybersecurity audit platform',
+                badge_ai: 'IA Local',
+                badge_secure: 'Datos seguros',
+                badge_langs: '7 idiomas',
+                badge_opensource: 'Open Source',
+                badge_frameworks: '4 Frameworks',
+                btn_audit: 'Auditoría',
+                btn_audit_sub: 'Evalúa NIST, ISO, CIS, COBIT',
+                btn_remediation: 'Remediación',
+                btn_remediation_sub: 'Gestiona hallazgos y cierra',
+                btn_learn: '📖 Saber más',
+                btn_learn_sub: 'Descubre el flujo',
+                scroll_desc: 'Descubre cómo funciona',
+                flow_title: 'El flujo completo de Auditoría',
+                flow_sub: 'AuditSym cubre todo el ciclo de vida: desde la evaluación hasta la remediación y la mejora continua.',
+                flow1_title: '1. Auditoría',
+                flow1_desc: 'Evalúa controles contra NIST, ISO, CIS o COBIT. Asigna riesgos, documenta evidencias y genera hallazgos.',
+                flow1_link: '→ Ir a Auditoría',
+                flow2_title: '2. Remediación',
+                flow2_desc: 'La empresa recibe los hallazgos, prioriza (Quick Wins), asigna responsables, sube evidencias y cierra.',
+                flow2_link: '→ Ir a Remediación',
+                flow3_title: '3. Mejora Continua',
+                flow3_desc: 'Visualiza la evolución año a año. Demuestra la mejora de la seguridad con datos históricos.',
+                flow3_link: '→ Descubrir más',
+                features_title: '¿Por qué AuditSym?',
+                features_sub: 'Construido para auditores que necesitan claridad, no complejidad.',
+                f1_title: 'Multi-Framework',
+                f1_desc: 'NIST CSF 2.0, ISO 27001, CIS Controls v8, COBIT 2019 — todos mapeados al Secure Controls Framework.',
+                f2_title: 'IA Local',
+                f2_desc: 'Toda la IA corre localmente. Ningún dato sale de tu máquina. Compatible con Ollama, OpenAI o Groq.',
+                f3_title: 'Matriz de Priorización',
+                f3_desc: 'Quick Wins primero — mayor impacto, más fáciles de resolver. Priorización visual para mejores decisiones.',
+                f4_title: 'Evolución Histórica',
+                f4_desc: 'Visualiza la mejora de la seguridad año tras año. Demuestra la mejora continua a los stakeholders.',
+                f5_title: '7 Idiomas',
+                f5_desc: 'ES, EN, FR, DE, PT, AR, ZH — construido para equipos globales y clientes internacionales.',
+                f6_title: 'Local First',
+                f6_desc: 'Todos los datos quedan en tu navegador. Exporta a JSON, importa cuando necesites. Sin nube, sin suscripción.',
+                footer_text: '© 2026 AuditSym — Hecho con ❤️ para auditores de seguridad. Todos los datos quedan en local.',
+                footer_audit: 'Auditoría',
+                footer_remediation: 'Remediación',
+            },
+            en: {
+                nav_about: 'About',
+                nav_features: 'Features',
+                btn_start: '🚀 Start',
+                tagline: '<strong>AI‑assisted</strong> cybersecurity audit platform',
+                badge_ai: 'Local AI',
+                badge_secure: 'Secure data',
+                badge_langs: '7 languages',
+                badge_opensource: 'Open Source',
+                badge_frameworks: '4 Frameworks',
+                btn_audit: 'Audit',
+                btn_audit_sub: 'Evaluate NIST, ISO, CIS, COBIT',
+                btn_remediation: 'Remediation',
+                btn_remediation_sub: 'Manage findings and close',
+                btn_learn: '📖 Learn More',
+                btn_learn_sub: 'Discover the flow',
+                scroll_desc: 'Discover how it works',
+                flow_title: 'The complete Audit Flow',
+                flow_sub: 'AuditSym covers the entire lifecycle: from assessment to remediation and continuous improvement.',
+                flow1_title: '1. Audit',
+                flow1_desc: 'Evaluate controls against NIST, ISO, CIS or COBIT. Assign risks, document evidence and generate findings.',
+                flow1_link: '→ Go to Audit',
+                flow2_title: '2. Remediation',
+                flow2_desc: 'The company receives findings, prioritizes (Quick Wins), assigns owners, uploads evidence and closes.',
+                flow2_link: '→ Go to Remediation',
+                flow3_title: '3. Continuous Improvement',
+                flow3_desc: 'Visualize year-over-year evolution. Demonstrate security improvement with historical data.',
+                flow3_link: '→ Discover more',
+                features_title: 'Why AuditSym?',
+                features_sub: 'Built for auditors who need clarity, not complexity.',
+                f1_title: 'Multi-Framework',
+                f1_desc: 'NIST CSF 2.0, ISO 27001, CIS Controls v8, COBIT 2019 — all mapped to the Secure Controls Framework.',
+                f2_title: 'Local AI',
+                f2_desc: 'All AI runs locally. No data leaves your machine. Compatible with Ollama, OpenAI or Groq.',
+                f3_title: 'Priority Matrix',
+                f3_desc: 'Quick Wins first — highest impact, easiest to solve. Visual prioritization for better decisions.',
+                f4_title: 'Historical Evolution',
+                f4_desc: 'Visualize security improvement year over year. Demonstrate continuous improvement to stakeholders.',
+                f5_title: '7 Languages',
+                f5_desc: 'ES, EN, FR, DE, PT, AR, ZH — built for global teams and international clients.',
+                f6_title: 'Local First',
+                f6_desc: 'All data stays in your browser. Export to JSON, import when needed. No cloud, no subscription.',
+                footer_text: '© 2026 AuditSym — Made with ❤️ for security auditors. All data stays local.',
+                footer_audit: 'Audit',
+                footer_remediation: 'Remediation',
+            },
+            fr: {
+                nav_about: 'À propos',
+                nav_features: 'Fonctionnalités',
+                btn_start: '🚀 Commencer',
+                tagline: '<strong>Assistée par IA</strong> plateforme d\'audit cybersécurité',
+                badge_ai: 'IA Locale',
+                badge_secure: 'Données sécurisées',
+                badge_langs: '7 langues',
+                badge_opensource: 'Open Source',
+                badge_frameworks: '4 Frameworks',
+                btn_audit: 'Audit',
+                btn_audit_sub: 'Évalue NIST, ISO, CIS, COBIT',
+                btn_remediation: 'Remédiation',
+                btn_remediation_sub: 'Gère les constats et clôture',
+                btn_learn: '📖 En savoir plus',
+                btn_learn_sub: 'Découvrir le flux',
+                scroll_desc: 'Découvrez comment ça fonctionne',
+                flow_title: 'Le flux complet d\'audit',
+                flow_sub: 'AuditSym couvre tout le cycle de vie : de l\'évaluation à la remédiation et à l\'amélioration continue.',
+                flow1_title: '1. Audit',
+                flow1_desc: 'Évalue les contrôles selon NIST, ISO, CIS ou COBIT. Attribue les risques, documente les preuves et génère des constats.',
+                flow1_link: '→ Aller à l\'Audit',
+                flow2_title: '2. Remédiation',
+                flow2_desc: 'L\'entreprise reçoit les constats, priorise (Quick Wins), assigne des responsables, télécharge des preuves et clôture.',
+                flow2_link: '→ Aller à la Remédiation',
+                flow3_title: '3. Amélioration Continue',
+                flow3_desc: 'Visualise l\'évolution année après année. Démontre l\'amélioration de la sécurité avec des données historiques.',
+                flow3_link: '→ Découvrir plus',
+                features_title: 'Pourquoi AuditSym?',
+                features_sub: 'Conçu pour les auditeurs qui ont besoin de clarté, pas de complexité.',
+                f1_title: 'Multi-Framework',
+                f1_desc: 'NIST CSF 2.0, ISO 27001, CIS Controls v8, COBIT 2019 — tous mappés vers le Secure Controls Framework.',
+                f2_title: 'IA Locale',
+                f2_desc: 'Toute l\'IA fonctionne localement. Aucune donnée ne quitte votre machine. Compatible avec Ollama, OpenAI ou Groq.',
+                f3_title: 'Matrice de Priorisation',
+                f3_desc: 'Quick Wins d\'abord — plus grand impact, plus faciles à résoudre. Priorisation visuelle.',
+                f4_title: 'Évolution Historique',
+                f4_desc: 'Visualise l\'amélioration de la sécurité année après année. Démontre l\'amélioration continue.',
+                f5_title: '7 Langues',
+                f5_desc: 'ES, EN, FR, DE, PT, AR, ZH — conçu pour les équipes mondiales.',
+                f6_title: 'Local First',
+                f6_desc: 'Toutes les données restent dans votre navigateur. Exportez en JSON, importez quand nécessaire.',
+                footer_text: '© 2026 AuditSym — Fait avec ❤️ pour les auditeurs. Toutes les données restent locales.',
+                footer_audit: 'Audit',
+                footer_remediation: 'Remédiation',
+            },
+            de: {
+                nav_about: 'Über uns',
+                nav_features: 'Funktionen',
+                btn_start: '🚀 Starten',
+                tagline: '<strong>KI-gestützte</strong> Cybersicherheits-Audit-Plattform',
+                badge_ai: 'Lokale KI',
+                badge_secure: 'Sichere Daten',
+                badge_langs: '7 Sprachen',
+                badge_opensource: 'Open Source',
+                badge_frameworks: '4 Frameworks',
+                btn_audit: 'Audit',
+                btn_audit_sub: 'Bewertet NIST, ISO, CIS, COBIT',
+                btn_remediation: 'Sanierung',
+                btn_remediation_sub: 'Verwalten und abschließen',
+                btn_learn: '📖 Mehr erfahren',
+                btn_learn_sub: 'Entdecken Sie den Ablauf',
+                scroll_desc: 'Entdecken Sie wie es funktioniert',
+                flow_title: 'Der vollständige Audit-Ablauf',
+                flow_sub: 'AuditSym deckt den gesamten Lebenszyklus ab: von der Bewertung bis zur Sanierung und kontinuierlichen Verbesserung.',
+                flow1_title: '1. Audit',
+                flow1_desc: 'Bewertet Kontrollen nach NIST, ISO, CIS oder COBIT. Weist Risiken zu, dokumentiert Nachweise und generiert Feststellungen.',
+                flow1_link: '→ Zum Audit',
+                flow2_title: '2. Sanierung',
+                flow2_desc: 'Das Unternehmen erhält Feststellungen, priorisiert (Quick Wins), weist Verantwortliche zu, lädt Nachweise hoch und schließt ab.',
+                flow2_link: '→ Zur Sanierung',
+                flow3_title: '3. Kontinuierliche Verbesserung',
+                flow3_desc: 'Visualisiert die Entwicklung Jahr für Jahr. Zeigt die Verbesserung der Sicherheit mit historischen Daten.',
+                flow3_link: '→ Mehr entdecken',
+                features_title: 'Warum AuditSym?',
+                features_sub: 'Entwickelt für Auditoren, die Klarheit brauchen, nicht Komplexität.',
+                f1_title: 'Multi-Framework',
+                f1_desc: 'NIST CSF 2.0, ISO 27001, CIS Controls v8, COBIT 2019 — alle auf das Secure Controls Framework abgebildet.',
+                f2_title: 'Lokale KI',
+                f2_desc: 'Die gesamte KI läuft lokal. Keine Daten verlassen Ihren Rechner. Kompatibel mit Ollama, OpenAI oder Groq.',
+                f3_title: 'Priorisierungsmatrix',
+                f3_desc: 'Quick Wins zuerst — höchste Auswirkung, am einfachsten zu lösen. Visuelle Priorisierung.',
+                f4_title: 'Historische Entwicklung',
+                f4_desc: 'Visualisiert die Verbesserung der Sicherheit Jahr für Jahr. Zeigt kontinuierliche Verbesserung.',
+                f5_title: '7 Sprachen',
+                f5_desc: 'ES, EN, FR, DE, PT, AR, ZH — entwickelt für globale Teams.',
+                f6_title: 'Lokal zuerst',
+                f6_desc: 'Alle Daten bleiben in Ihrem Browser. Exportieren Sie nach JSON, importieren Sie bei Bedarf.',
+                footer_text: '© 2026 AuditSym — Mit ❤️ für Sicherheitsauditoren. Alle Daten bleiben lokal.',
+                footer_audit: 'Audit',
+                footer_remediation: 'Sanierung',
+            },
+            pt: {
+                nav_about: 'Sobre',
+                nav_features: 'Funcionalidades',
+                btn_start: '🚀 Começar',
+                tagline: '<strong>Assistida por IA</strong> plataforma de auditoria de cibersegurança',
+                badge_ai: 'IA Local',
+                badge_secure: 'Dados seguros',
+                badge_langs: '7 idiomas',
+                badge_opensource: 'Open Source',
+                badge_frameworks: '4 Frameworks',
+                btn_audit: 'Auditoria',
+                btn_audit_sub: 'Avalia NIST, ISO, CIS, COBIT',
+                btn_remediation: 'Remediação',
+                btn_remediation_sub: 'Gerencia achados e fecha',
+                btn_learn: '📖 Saber mais',
+                btn_learn_sub: 'Descubra o fluxo',
+                scroll_desc: 'Descubra como funciona',
+                flow_title: 'O fluxo completo de Auditoria',
+                flow_sub: 'AuditSym cobre todo o ciclo de vida: da avaliação à remediação e melhoria contínua.',
+                flow1_title: '1. Auditoria',
+                flow1_desc: 'Avalia controles contra NIST, ISO, CIS ou COBIT. Atribui riscos, documenta evidências e gera achados.',
+                flow1_link: '→ Ir para Auditoria',
+                flow2_title: '2. Remediação',
+                flow2_desc: 'A empresa recebe os achados, prioriza (Quick Wins), atribui responsáveis, envia evidências e fecha.',
+                flow2_link: '→ Ir para Remediação',
+                flow3_title: '3. Melhoria Contínua',
+                flow3_desc: 'Visualiza a evolução ano após ano. Demonstra a melhoria da segurança com dados históricos.',
+                flow3_link: '→ Descobrir mais',
+                features_title: 'Porquê AuditSym?',
+                features_sub: 'Construído para auditores que precisam de clareza, não complexidade.',
+                f1_title: 'Multi-Framework',
+                f1_desc: 'NIST CSF 2.0, ISO 27001, CIS Controls v8, COBIT 2019 — todos mapeados para o Secure Controls Framework.',
+                f2_title: 'IA Local',
+                f2_desc: 'Toda a IA corre localmente. Nenhum dado sai da sua máquina. Compatível com Ollama, OpenAI ou Groq.',
+                f3_title: 'Matriz de Priorização',
+                f3_desc: 'Quick Wins primeiro — maior impacto, mais fáceis de resolver. Priorização visual.',
+                f4_title: 'Evolução Histórica',
+                f4_desc: 'Visualiza a melhoria da segurança ano após ano. Demonstra a melhoria contínua.',
+                f5_title: '7 Idiomas',
+                f5_desc: 'ES, EN, FR, DE, PT, AR, ZH — construído para equipas globais.',
+                f6_title: 'Local First',
+                f6_desc: 'Todos os dados ficam no seu navegador. Exporte para JSON, importe quando necessário.',
+                footer_text: '© 2026 AuditSym — Feito com ❤️ para auditores de segurança. Todos os dados ficam locais.',
+                footer_audit: 'Auditoria',
+                footer_remediation: 'Remediação',
+            }
+        };
+
+        let currentLang = 'es';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('auditsym_lang', lang);
+            document.documentElement.lang = lang;
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                const translation = translations[lang]?.[key] || translations.es[key] || key;
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.placeholder = translation;
+                } else {
+                    el.innerHTML = translation;
+                }
+            });
+
+            document.getElementById('langSelector').value = lang;
+        }
+
+        // ────────────────────────────────────────────────
+        // 🚀 INICIALIZACIÓN
+        // ────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedLang = localStorage.getItem('auditsym_lang') || 'es';
+            setLanguage(savedLang);
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        e.preventDefault();
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

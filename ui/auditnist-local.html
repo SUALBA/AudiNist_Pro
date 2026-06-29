@@ -28,7 +28,7 @@ cyberevil: '#ef4444', cyberwarn: '#facc15', cyberok: '#22c55e'
 // ─────────────────────────────────────────────────────────────────────────────
 class Control {
   static VALID_COMPLIANCE = ['yes', 'no', 'partial', ''];
-  static VALID_RISK       = ['high', 'medium', 'low', ''];
+  static VALID_RISK       = ['critical', 'high', 'medium', 'low', ''];
 
   constructor({ scfId='', fwCode='', name='', question='', vertical='', guidance='' } = {}) {
     this.scfId=scfId; this.fwCode=fwCode; this.name=name;
@@ -50,7 +50,7 @@ class Control {
 
 class Evaluation {
   static VALID_COMPLIANCE = ['yes', 'no', 'partial'];
-  static VALID_RISK       = ['high', 'medium', 'low', ''];
+  static VALID_RISK       = ['critical', 'high', 'medium', 'low', ''];
 
   constructor({ scfId, auditId, compliance, risk='', evidence='', notes='', company='', auditor='', vertical='' }={}) {
     const errs = Evaluation.validate({ scfId, auditId, compliance, risk });
@@ -78,9 +78,10 @@ class AuditSession {
     const total=this.controls.length, compliant=this.controls.filter(c=>c.compliance==='yes').length,
           partial=this.controls.filter(c=>c.compliance==='partial').length,
           nonCompliant=this.controls.filter(c=>c.compliance==='no').length,
+          criticalRisk=this.controls.filter(c=>c.risk==='critical').length,
           highRisk=this.controls.filter(c=>c.risk==='high').length,
           evaluated=this.controls.filter(c=>c.compliance!=='').length;
-    return {total,evaluated,compliant,partial,nonCompliant,highRisk};
+    return {total,evaluated,compliant,partial,nonCompliant,criticalRisk,highRisk};
   }
   toJSON(){ return {id:this.id,empresa:this.empresa,auditora:this.auditora,auditor:this.auditor,alcance:this.alcance,fecha:this.fecha,framework:this.framework,controls:this.controls.map(c=>c.toJSON?c.toJSON():c),createdAt:this.createdAt,updatedAt:this.updatedAt}; }
   static fromJSON(d={}){ const s=new AuditSession(d); s.controls=(d.controls||[]).map(c=>Control.fromJSON(c)); s.createdAt=d.createdAt??Date.now(); s.updatedAt=d.updatedAt??Date.now(); return s; }
@@ -93,7 +94,7 @@ class AuditSession {
 class AssessmentEngine {
   static FRAMEWORK_TOTALS = { 'nist-csf':106, 'iso27001':93, 'cis':153, 'cobit':40 };
   static STATUS_SCORES    = { yes:1.0, partial:0.5, no:0.0, '':0.0 };
-  static RISK_MULTIPLIERS = { high:2.5, medium:1.5, low:1.0, '':1.0 };
+  static RISK_MULTIPLIERS = { critical:3.5, high:2.5, medium:1.5, low:1.0, '':1.0 };
   static POSTURE_BANDS    = [
     { min:0.80, label:'Strong',        color:'#22c55e' },
     { min:0.60, label:'Moderate',      color:'#facc15' },
@@ -110,13 +111,14 @@ class AssessmentEngine {
 
   static calculate(controls=[], frameworkKey='nist-csf') {
     const fwWeight = 1 / (this.FRAMEWORK_TOTALS[frameworkKey] ?? 100);
-    let totalAchieved=0, totalPossible=0, highRiskNonCompliant=0;
+    let totalAchieved=0, totalPossible=0, criticalRiskNonCompliant=0, highRiskNonCompliant=0;
     const domainStats={};
     controls.forEach(ctrl => {
       const ss = this.STATUS_SCORES[ctrl.compliance] ?? 0;
       const rm = this.RISK_MULTIPLIERS[ctrl.risk] ?? 1.0;
       totalAchieved += ss * rm * fwWeight;
       totalPossible += 1.0 * rm * fwWeight;
+      if (ctrl.compliance==='no' && ctrl.risk==='critical') criticalRiskNonCompliant++;
       if (ctrl.compliance==='no' && ctrl.risk==='high') highRiskNonCompliant++;
       const d = ctrl.domain||'General';
       if (!domainStats[d]) domainStats[d]={total:0,nonCompliant:0};
@@ -126,13 +128,13 @@ class AssessmentEngine {
     const overallScore = totalPossible>0 ? totalAchieved/totalPossible : 0;
     const overallScorePct = Math.round(overallScore*100);
     let postureObj = this.POSTURE_BANDS.find(b=>overallScore>=b.min) ?? this.POSTURE_BANDS[3];
-    if (highRiskNonCompliant>=10) postureObj=this.POSTURE_BANDS[3];
+    if (criticalRiskNonCompliant>=1 || highRiskNonCompliant>=10) postureObj=this.POSTURE_BANDS[3];
     else if (highRiskNonCompliant>=5 && postureObj.label==='Strong') postureObj=this.POSTURE_BANDS[1];
     const maturityObj = this.MATURITY_BANDS.find(b=>overallScore>=b.min) ?? this.MATURITY_BANDS[4];
     const weakDomains = Object.entries(domainStats)
       .filter(([,s])=>s.total>0 && s.nonCompliant/s.total>0.5).map(([d])=>d);
     return { overallScore, overallScorePct, posture:postureObj.label, postureColor:postureObj.color,
-             maturity:maturityObj.label, highRiskNonCompliant, weakDomains, domainStats,
+             maturity:maturityObj.label, criticalRiskNonCompliant, highRiskNonCompliant, weakDomains, domainStats,
              frameworkKey, controlsEvaluated:controls.length };
   }
 
@@ -146,7 +148,7 @@ class AssessmentEngine {
     const langs={en:'English',es:'Spanish (Español)',fr:'French (Français)',de:'German (Deutsch)',pt:'Portuguese (Português)',ar:'Arabic (العربية)',zh:'Mandarin Chinese (中文)'};
     const language=langs[lang]||'English';
     const total=stats.total||0, compliant=stats.compliant||0, partial=stats.partial||0,
-          nonComp=stats.nonCompliant||0, highRisk=stats.highRisk||0,
+          nonComp=stats.nonCompliant||0, criticalRisk=stats.criticalRisk||0, highRisk=stats.highRisk||0,
           medRisk=stats.mediumRisk||0, lowRisk=stats.lowRisk||0;
     const pct=n=>total>0?`${Math.round((n/total)*100)}%`:'0%';
     const weakStr=assessment.weakDomains.length>0?assessment.weakDomains.join(', '):'None identified';
@@ -180,12 +182,14 @@ Control Breakdown:
   Non-Compliant:            ${nonComp}   (${pct(nonComp)})
 
 Risk Distribution:
+  Critical Risk:${criticalRisk}
   High Risk:    ${highRisk}
   Medium Risk:  ${medRisk}
   Low Risk:     ${lowRisk}
 
 Critical Findings:
-  High-Risk Non-Compliant Controls:  ${assessment.highRiskNonCompliant}
+  Critical-Risk Non-Compliant Controls: ${assessment.criticalRiskNonCompliant}
+  High-Risk Non-Compliant Controls:     ${assessment.highRiskNonCompliant}
   Weak Domains (>50% non-compliant): ${weakStr}
 
 ────────────────────────────────────────────────
@@ -219,7 +223,7 @@ Return ONLY valid JSON with no markdown, no code fences, no text outside the JSO
       ?`Domains identified as requiring urgent attention: ${assessment.weakDomains.join(', ')}.`
       :'No individual domains exceeded the critical non-compliance threshold.';
     return {
-      executive_summary:`The security audit of ${auditData.company||'the organization'} under the ${auditData.framework} framework yields an overall risk-weighted score of ${assessment.overallScorePct}%, reflecting a ${assessment.posture} security posture at the ${assessment.maturity} maturity level. Of ${total} controls evaluated, ${compliant} are fully compliant and ${nonComp} require remediation, with ${assessment.highRiskNonCompliant} high-risk non-compliant controls representing the most critical exposure. ${weakStr} Leadership attention is advised to prioritize remediation of high-risk gaps to advance the organization's security maturity.`,
+      executive_summary:`The security audit of ${auditData.company||'the organization'} under the ${auditData.framework} framework yields an overall risk-weighted score of ${assessment.overallScorePct}%, reflecting a ${assessment.posture} security posture at the ${assessment.maturity} maturity level. Of ${total} controls evaluated, ${compliant} are fully compliant and ${nonComp} require remediation, with ${assessment.criticalRiskNonCompliant} critical-risk and ${assessment.highRiskNonCompliant} high-risk non-compliant controls representing the most critical exposure. ${weakStr} Leadership attention is advised to prioritize remediation of high-risk gaps to advance the organization's security maturity.`,
       strengths:[
         `${compliant} of ${total} controls (${total>0?Math.round((compliant/total)*100):0}%) demonstrate full compliance, indicating foundational security practices are in place.`,
         `Partial compliance on ${partial} control${partial!==1?'s':''} suggests existing process awareness that can be leveraged for accelerated remediation.`,
@@ -227,13 +231,13 @@ Return ONLY valid JSON with no markdown, no code fences, no text outside the JSO
       ],
       key_gaps:[
         `${nonComp} non-compliant control${nonComp!==1?'s':''} represent direct exposure to regulatory and operational risk.`,
-        `${assessment.highRiskNonCompliant} high-risk non-compliant control${assessment.highRiskNonCompliant!==1?'s':''} require immediate executive-level escalation.`,
+        `${assessment.criticalRiskNonCompliant} critical-risk and ${assessment.highRiskNonCompliant} high-risk non-compliant control${(assessment.criticalRiskNonCompliant + assessment.highRiskNonCompliant)!==1?'s':''} require immediate executive-level escalation.`,
         assessment.weakDomains.length>0
           ?`Weak domains detected: ${assessment.weakDomains.join(', ')} — each exceeding 50% non-compliance, indicating systemic process failures.`
           :`Partial compliance controls indicate gaps in implementation consistency across the evaluated control set.`
       ],
       immediate_actions:[
-        `Initiate a formal remediation plan for all ${assessment.highRiskNonCompliant} high-risk non-compliant controls within 30 days, with defined ownership and milestone dates.`,
+        `Initiate a formal remediation plan for all ${assessment.criticalRiskNonCompliant} critical-risk and ${assessment.highRiskNonCompliant} high-risk non-compliant controls within 30 days, with defined ownership and milestone dates.`,
         `Conduct a root-cause analysis for each non-compliant control to distinguish process gaps from technology deficiencies.`
       ],
       medium_term_improvements:[
@@ -267,7 +271,7 @@ Return ONLY valid JSON with no markdown, no code fences, no text outside the JSO
         <!-- Título + Badge -->
         <div class="flex items-center gap-2">
           <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyberaccent to-purple-400 bg-clip-text text-transparent">
-            AuditNIST Pro
+            AuditSym Pro
           </h1>
           <span class="text-[10px] bg-purple-900/50 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/30 hidden sm:inline-block">
             + IA
@@ -381,7 +385,7 @@ class="absolute w-full bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-
   </div>
   
   <!-- Fila 1: KPIs Principales (5 columnas balanceadas) -->
-  <div class="grid grid-cols-5 gap-3">
+  <div class="grid grid-cols-6 gap-3">
     <!-- Total Evaluados -->
     <div class="bg-gradient-to-br from-gray-800 to-gray-700/50 border border-gray-600 rounded-lg p-3 text-center hover:border-cyberaccent transition-colors">
       <div class="text-2xl font-bold text-cyberaccent" id="dash-total-controls">0</div>
@@ -407,10 +411,15 @@ class="absolute w-full bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-
       <div class="text-xs text-red-300" data-i18n="dash_noncompliant">No Cumplidos ❌</div>
     </div>
 
+    <!-- Riesgos Críticos -->
+    <div class="bg-gradient-to-br from-red-950/60 to-red-900/40 border border-red-700/50 rounded-lg p-3 text-center hover:border-red-500 transition-colors">
+    <div class="text-2xl font-bold text-red-500" id="dash-critical-risk">0</div>
+    <div class="text-xs text-red-400" data-i18n="dash_critical_risk">Riesgos Críticos 🔴🔴</div>
+    </div>
     <!-- Riesgos Altos -->
     <div class="bg-gradient-to-br from-orange-900/40 to-red-900/20 border border-orange-600/50 rounded-lg p-3 text-center hover:border-orange-400 transition-colors">
-      <div class="text-2xl font-bold text-orange-400" id="dash-high-risk">0</div>
-      <div class="text-xs text-orange-300" data-i18n="dash_high_risk">Riesgos Altos 🔴</div>
+    <div class="text-2xl font-bold text-orange-400" id="dash-high-risk">0</div>
+    <div class="text-xs text-orange-300" data-i18n="dash_high_risk">Riesgos Altos 🔴</div>
     </div>
   </div>
 
@@ -573,43 +582,39 @@ data-i18n="import_json_btn">📂 Importar JSON
   
   <!-- Gráfico 1: Cumplimiento -->
   <div class="bg-cyberpanel border border-cyberaccent/30 rounded-lg p-3 shadow-md">
-    <div class="flex items-center justify-between mb-2">
-      <h2 class="text-cyberaccent font-bold text-[11px] flex items-center gap-1.5">
-        <span class="w-4 h-4 rounded bg-gradient-to-br from-cyberok to-green-400 flex items-center justify-center shadow-sm shadow-green-500/30">
-          <span class="text-[8px]">🎯</span>
-        </span>
-        <span data-i18n="Cumplimiento">Cumplimiento</span>
-      </h2>
-      <!-- PORCENTAJE AQUÍ (esquina superior derecha) -->
-      <span id="compliance-percentage" class="text-lg font-bold text-cyberok drop-shadow-[0_0_6px_#22c55e]">0%</span>
-    </div>
-    <div class="h-32 w-32 mx-auto">
-      <canvas id="chartCompliance"></canvas>
-    </div>
-    <div class="flex justify-center gap-4 mt-2 text-[9px]">
-      <span class="flex items-center gap-1"><span class="text-cyberok text-[12px]">●</span><span class="text-gray-400">Sí</span></span>
-      <span class="flex items-center gap-1"><span class="text-cyberevil text-[12px]">●</span><span class="text-gray-400">No</span></span>
-      <span class="flex items-center gap-1"><span class="text-cyberwarn text-[12px]">●</span><span class="text-gray-400">Parcial</span></span>
-    </div>
-  </div>
-
-  <!-- Gráfico 2: Riesgos -->
-  <div class="bg-cyberpanel border border-cyberaccent/30 rounded-lg p-3 shadow-md">
-    <h2 class="text-cyberaccent font-bold text-[11px] mb-2 flex items-center gap-1.5">
-      <span class="w-4 h-4 rounded bg-gradient-to-br from-cyberevil to-red-400 flex items-center justify-center shadow-sm shadow-red-500/30">
-        <span class="text-[8px]">⚠️</span>
+  <div class="flex items-center justify-between mb-2">
+    <h2 class="text-cyberaccent font-bold text-sm flex items-center gap-1.5">
+      <span class="w-4 h-4 rounded bg-gradient-to-br from-cyberok to-green-400 flex items-center justify-center shadow-sm shadow-green-500/30">
+        <span class="text-[8px]">🎯</span>
       </span>
-      <span data-i18n="Riesgos">Riesgos</span>
+      <span data-i18n="Cumplimiento">Cumplimiento</span>
     </h2>
-    <div class="h-28 w-full px-1">
-      <canvas id="chartRisk"></canvas>
-    </div>
-    <div class="flex justify-center gap-4 mt-2 text-[9px]">
-      <span class="flex items-center gap-1"><span class="text-cyberevil text-[12px]">●</span><span class="text-gray-400">Alto</span></span>
-      <span class="flex items-center gap-1"><span class="text-cyberwarn text-[12px]">●</span><span class="text-gray-400">Medio</span></span>
-      <span class="flex items-center gap-1"><span class="text-cyberok text-[12px]">●</span><span class="text-gray-400">Bajo</span></span>
-    </div>
+    <!-- PORCENTAJE AQUÍ (esquina superior derecha) -->
+    <span id="compliance-percentage" class="text-lg font-bold text-cyberok drop-shadow-[0_0_6px_#22c55e]">0%</span>
   </div>
+  <div class="h-32 w-32 mx-auto">
+    <canvas id="chartCompliance"></canvas>
+  </div>
+</div>
+   
+  <!-- Gráfico 2: Riesgos -->
+<div class="bg-cyberpanel border border-cyberaccent/30 rounded-lg p-3 shadow-md">
+  <h2 class="text-cyberaccent font-bold text-sm mb-2 flex items-center gap-1.5">
+    <span class="w-4 h-4 rounded bg-gradient-to-br from-cyberevil to-red-400 flex items-center justify-center shadow-sm shadow-red-500/30">
+      <span class="text-[8px]">⚠️</span>
+    </span>
+    <span data-i18n="Riesgos">Riesgos</span>
+  </h2>
+  <div class="h-28 w-full px-1">
+    <canvas id="chartRisk"></canvas>
+  </div>
+  <div class="flex justify-center gap-3 mt-2 text-[9px]">
+    <span class="flex items-center gap-1"><span class="text-red-700 text-[12px]">●</span><span class="text-gray-400">Crítico</span></span>
+    <span class="flex items-center gap-1"><span class="text-cyberevil text-[12px]">●</span><span class="text-gray-400">Alto</span></span>
+    <span class="flex items-center gap-1"><span class="text-cyberwarn text-[12px]">●</span><span class="text-gray-400">Medio</span></span>
+    <span class="flex items-center gap-1"><span class="text-cyberok text-[12px]">●</span><span class="text-gray-400">Bajo</span></span>
+  </div>
+</div>
 
   <!-- Gráfico 3: Evaluaciones -->
   <div class="bg-cyberpanel border border-cyberaccent/30 rounded-lg p-3 shadow-md">
@@ -632,7 +637,7 @@ data-i18n="import_json_btn">📂 Importar JSON
 </div>
 
 <footer class="container mx-auto p-4 text-center text-gray-500">
-© 2025 AuditNIST Local — sualba.dev
+© 2025 AuditSym Local — sualba.dev
 </footer>
 
 <!-- Extra buttons -->
@@ -1254,79 +1259,73 @@ compliant: compliant
 },
 
 updateDashboard() {
-    const stats = { total: 0, compliant: 0, partial: 0, nonCompliant: 0, highRisk: 0, mediumRisk: 0, lowRisk: 0 };
-    
-    Object.values(this.store).forEach(control => {
-      control.evaluations.forEach(ev => {
-        stats.total++;
-        if (ev.compliance === 'yes')          stats.compliant++;
-        else if (ev.compliance === 'no')       stats.nonCompliant++;
-        else if (ev.compliance === 'partial')  stats.partial++;
-        
-        if (ev.risk === 'high')      stats.highRisk++;
-        else if (ev.risk === 'medium') stats.mediumRisk++;
-        else if (ev.risk === 'low')   stats.lowRisk++;
-      });
-    });
+const stats = { total: 0, compliant: 0, partial: 0, nonCompliant: 0, criticalRisk: 0, highRisk: 0, mediumRisk: 0, lowRisk: 0 };
+Object.values(this.store).forEach(control => {
+control.evaluations.forEach(ev => {
+stats.total++;
+if (ev.compliance === 'yes')          stats.compliant++;
+else if (ev.compliance === 'no')       stats.nonCompliant++;
+else if (ev.compliance === 'partial')  stats.partial++;
+if (ev.risk === 'critical')    stats.criticalRisk++;
+else if (ev.risk === 'high')   stats.highRisk++;
+else if (ev.risk === 'medium') stats.mediumRisk++;
+else if (ev.risk === 'low')    stats.lowRisk++;
+});
+});
 
-    document.getElementById('dash-total-controls').textContent = stats.total;
-    document.getElementById('dash-compliant').textContent = stats.compliant;
-    document.getElementById('dash-partial').textContent = stats.partial;
-    document.getElementById('dash-noncompliant').textContent = stats.nonCompliant;
-    document.getElementById('dash-high-risk').textContent = stats.highRisk;
-    
-    const pending = stats.nonCompliant + stats.partial;
-    const pendingEl = document.getElementById('dash-total-remaining');
-    if (pendingEl) {
-      pendingEl.textContent = `${pending} pendiente${pending !== 1 ? 's' : ''}`;
-    }
+// ¡CORRECCIÓN AQUÍ! Usar las variables 'stats' en lugar de '0'
+document.getElementById('dash-total-controls').textContent = stats.total;
+document.getElementById('dash-compliant').textContent = stats.compliant;
+document.getElementById('dash-partial').textContent = stats.partial;
+document.getElementById('dash-noncompliant').textContent = stats.nonCompliant;
+document.getElementById('dash-critical-risk').textContent = stats.criticalRisk;
+document.getElementById('dash-high-risk').textContent = stats.highRisk;
 
-    const complianceRate = stats.total > 0 ? Math.round((stats.compliant / stats.total) * 100) : 0;
-    const rateEl = document.getElementById('dash-compliance-rate');
-    const barEl = document.getElementById('dash-compliance-bar');
-    const textEl = document.getElementById('dash-compliance-text');
-    
-    if (rateEl) {
-      rateEl.textContent = `${complianceRate}%`;
-      rateEl.className = `text-lg font-bold ${
-        complianceRate >= 80 ? 'text-cyberok' : 
-        complianceRate >= 50 ? 'text-cyberwarn' : 
-        'text-cyberevil'
-      }`;
-    }
-    if (barEl) barEl.style.width = `${complianceRate}%`;
-    if (textEl) textEl.textContent = `${stats.compliant}/${stats.total} controles`;
+const pending = stats.nonCompliant + stats.partial;
+const pendingEl = document.getElementById('dash-total-remaining');
+if (pendingEl) {
+pendingEl.textContent = `${pending} pendiente${pending !== 1 ? 's' : ''}`;
+}
 
-    const timestampEl = document.getElementById('dashboard-timestamp');
-    if (timestampEl) {
-      const now = new Date();
-      timestampEl.textContent = `🕐 ${now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
-    }
+const complianceRate = stats.total > 0 ? Math.round((stats.compliant / stats.total) * 100) : 0;
+const rateEl = document.getElementById('dash-compliance-rate');
+const barEl = document.getElementById('dash-compliance-bar');
+const textEl = document.getElementById('dash-compliance-text');
 
-    const percentageEl = document.getElementById('compliance-percentage');
-    if (percentageEl) {
-      percentageEl.textContent = `${complianceRate}%`;
-      percentageEl.className = `text-center mt-2 text-2xl font-bold ${
-        complianceRate >= 80 ? 'text-cyberok' : complianceRate >= 50 ? 'text-cyberwarn' : 'text-cyberevil'
-      }`;
-    }
+if (rateEl) {
+rateEl.textContent = `${complianceRate}%`;
+rateEl.className = `text-lg font-bold ${complianceRate >= 80 ? 'text-cyberok' : complianceRate >= 50 ? 'text-cyberwarn' : 'text-cyberevil'}`;
+}
+if (barEl) barEl.style.width = `${complianceRate}%`;
+if (textEl) textEl.textContent = `${stats.compliant}/${stats.total} controles`;
 
-    if (chartComp) {
-      chartComp.data.datasets[0].data = [stats.compliant, stats.nonCompliant, stats.partial];
-      chartComp.update();
-    }
-    
-    if (chartFramework) {
-      const fwLabels = Object.keys(FRAMEWORKS).map(fw => FRAMEWORKS[fw].name);
-      const fwData = Object.keys(FRAMEWORKS).map(fw => {
-        const progress = this.getFrameworkProgress(fw);
-        return progress.compliant;
-      });
-      chartFramework.data.labels = fwLabels;
-      chartFramework.data.datasets[0].data = fwData;
-      chartFramework.update();
-    }
-  },
+const timestampEl = document.getElementById('dashboard-timestamp');
+if (timestampEl) {
+const now = new Date();
+timestampEl.textContent = `🕐 ${now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+}
+
+const percentageEl = document.getElementById('compliance-percentage');
+if (percentageEl) {
+percentageEl.textContent = `${complianceRate}%`;
+percentageEl.className = `text-center mt-2 text-2xl font-bold ${complianceRate >= 80 ? 'text-cyberok' : complianceRate >= 50 ? 'text-cyberwarn' : 'text-cyberevil'}`;
+}
+
+if (chartComp) {
+chartComp.data.datasets[0].data = [stats.compliant, stats.nonCompliant, stats.partial];
+chartComp.update();
+}
+if (chartFramework) {
+const fwLabels = Object.keys(FRAMEWORKS).map(fw => FRAMEWORKS[fw].name);
+const fwData = Object.keys(FRAMEWORKS).map(fw => {
+const progress = this.getFrameworkProgress(fw);
+return progress.compliant;
+});
+chartFramework.data.labels = fwLabels;
+chartFramework.data.datasets[0].data = fwData;
+chartFramework.update();
+}
+},
 
 getLatest(scfId) {
   const evals = this.store[scfId]?.evaluations || [];
@@ -1349,7 +1348,7 @@ function showGridPreview() {
 const grid = document.getElementById('controls-visual-grid');
 grid.classList.remove('hidden');
 if (gridTimeout) clearTimeout(gridTimeout);
-gridTimeout = setTimeout(() => { grid.classList.add('hidden'); }, 5000);
+gridTimeout = setTimeout(() => { grid.classList.add('hidden'); }, 15000);
 }
 
 function addControlFromGrid(scfId, fwCode, name) {
@@ -1533,6 +1532,7 @@ onclick="event.stopPropagation()" readonly />
 <span class="text-gray-400 text-[10px]">${T('risk_label')}</span>
 <select class="riesgo bg-gray-700 text-white rounded px-1 py-1">
 <option value="">--</option>
+<option value="critical" data-i18n="critical">${T('critical')}</option>
 <option value="high" data-i18n="high">${T('high')}</option>
 <option value="medium" data-i18n="medium">${T('medium')}</option>
 <option value="low" data-i18n="low">${T('low')}</option>
@@ -1808,7 +1808,7 @@ function updateCharts() {
   if (!chartComp || !chartRisk) return;
 
   const stats = { ok: 0, no: 0, partial: 0 };
-  const riskStats = { high: 0, medium: 0, low: 0 };
+  const riskStats = { critical: 0, high: 0, medium: 0, low: 0 };
 
   Object.values(EvaluationRegistry.store).forEach(control => {
     control.evaluations.forEach(ev => {
@@ -1816,6 +1816,7 @@ function updateCharts() {
       if (ev.compliance === 'no') stats.no++;
       if (ev.compliance === 'partial') stats.partial++;
 
+      if (ev.risk === 'critical') riskStats.critical++;
       if (ev.risk === 'high') riskStats.high++;
       if (ev.risk === 'medium') riskStats.medium++;
       if (ev.risk === 'low') riskStats.low++;
@@ -1830,6 +1831,7 @@ function updateCharts() {
   chartComp.update();
 
   chartRisk.data.datasets[0].data = [
+    riskStats.critical,
     riskStats.high,
     riskStats.medium,
     riskStats.low
@@ -1876,10 +1878,10 @@ function initCharts() {
   chartRisk = new Chart(document.getElementById('chartRisk').getContext('2d'), {
     type: 'bar',
     data: { 
-      labels: ['Alto', 'Medio', 'Bajo'],
+      labels: ['Crítico', 'Alto', 'Medio', 'Bajo'],
       datasets: [{ 
-        data: [0, 0, 0], 
-        backgroundColor: ['#ef4444', '#facc15', '#22c55e'],
+        data: [0, 0, 0, 0], 
+        backgroundColor: ['#7f1d1d', '#ef4444', '#facc15', '#22c55e'],
         borderRadius: 3,
         barPercentage: 0.65,
         categoryPercentage: 0.8
@@ -1974,6 +1976,7 @@ function clearData() {
   document.getElementById('dash-compliant').textContent = 0;
   document.getElementById('dash-partial').textContent = 0;
   document.getElementById('dash-noncompliant').textContent = 0;
+  document.getElementById('dash-critical-risk').textContent = 0;
   document.getElementById('dash-high-risk').textContent = 0;
   
   // Limpiar elementos nuevos del dashboard
@@ -1996,7 +1999,7 @@ function clearData() {
     chartComp.update();
   }
   if (chartRisk) {
-    chartRisk.data.datasets[0].data = [0,0,0];
+    chartRisk.data.datasets[0].data = [0,0,0,0];
     chartRisk.update();
   }
   if (chartFramework) {
@@ -2153,7 +2156,7 @@ reader.readAsText(file);
 // 🔹 PDF GENERATION 
 // ─────────────────────────────────────────────────────────────────────────────
 function calculateAuditStats(controls) {
-  const stats = { total: 0, compliant: 0, partial: 0, nonCompliant: 0, highRisk: 0, mediumRisk: 0, lowRisk: 0 };
+  const stats = { total: 0, compliant: 0, partial: 0, nonCompliant: 0, criticalRisk: 0, highRisk: 0, mediumRisk: 0, lowRisk: 0 };
   controls.forEach(blk => {
     const c = blk.querySelector('.cumple')?.value;
     const r = blk.querySelector('.riesgo')?.value;
@@ -2161,7 +2164,8 @@ function calculateAuditStats(controls) {
     if (c === 'yes') stats.compliant++;
     else if (c === 'partial') stats.partial++;
     else if (c === 'no') stats.nonCompliant++;
-    if (r === 'high') stats.highRisk++;
+    if (r === 'critical') stats.criticalRisk++;
+    else if (r === 'high') stats.highRisk++;
     else if (r === 'medium') stats.mediumRisk++;
     else if (r === 'low') stats.lowRisk++;
   });
@@ -2177,6 +2181,7 @@ function hexToRgb(hex) {
 
 function calculateOverallRisk(stats) {
   if (!stats.total) return 'low';
+  if (stats.criticalRisk > 0 || stats.criticalRisk / stats.total > 0.05) return 'critical';
   if (stats.highRisk / stats.total > 0.2) return 'high';
   if (stats.mediumRisk / stats.total > 0.4) return 'medium';
   return 'low';
@@ -2184,6 +2189,7 @@ function calculateOverallRisk(stats) {
 
 function getRiskColor(level) {
   const map = {
+    'critical': [127, 29, 29],
     'high': [239, 68, 68],
     'medium': [245, 158, 11], 
     'low': [34, 197, 94]
@@ -2248,7 +2254,7 @@ async function runAIAssessment() {
 
   const stats = {
     total:        0, compliant: 0, partial: 0,
-    nonCompliant: 0, highRisk: 0, mediumRisk: 0, lowRisk: 0
+    nonCompliant: 0, criticalRisk: 0, highRisk: 0, mediumRisk: 0, lowRisk: 0
   };
   Object.values(EvaluationRegistry.store).forEach(ctrl => {
     ctrl.evaluations.forEach(ev => {
@@ -2256,7 +2262,8 @@ async function runAIAssessment() {
       if (ev.compliance==='yes')          stats.compliant++;
       else if (ev.compliance==='no')      stats.nonCompliant++;
       else if (ev.compliance==='partial') stats.partial++;
-      if (ev.risk==='high')   stats.highRisk++;
+      if (ev.risk==='critical') stats.criticalRisk++;
+      else if (ev.risk==='high')   stats.highRisk++;
       else if (ev.risk==='medium') stats.mediumRisk++;
       else if (ev.risk==='low')    stats.lowRisk++;
     });
@@ -2811,6 +2818,7 @@ async function testAIConnection() {
 
 function generatePriorityRecommendationsSync(stats) {
   const recs = [];
+  if (stats.criticalRisk > 0) recs.push('Escalate critical-risk controls immediately and assign remediation owners');
   if (stats.highRisk > 0) recs.push('Address high-risk non-compliant controls within 30 days');
   if (stats.nonCompliant > stats.total * 0.3) recs.push('Develop remediation roadmap for critical gaps');
   if (stats.partial > 0) recs.push('Formalize procedures for partially implemented controls');
@@ -2948,6 +2956,7 @@ window.addEventListener('beforeunload', () => {
     y += 18;
 
     const riskData = [
+      { label: 'Critical', count: stats.criticalRisk, color: [127, 29, 29] },
       { label: 'High', count: stats.highRisk, color: COLORS.danger },
       { label: 'Medium', count: stats.mediumRisk, color: COLORS.warning },
       { label: 'Low', count: stats.lowRisk, color: COLORS.success }
@@ -3047,7 +3056,7 @@ window.addEventListener('beforeunload', () => {
       doc.text(compText, margin + 48, y + 3, { align: 'center' });
 
       // Badge de riesgo
-      const riskText = risk === 'high' ? 'HIGH RISK' : risk === 'medium' ? 'MEDIUM' : 'LOW';
+      const riskText = risk === 'critical' ? 'CRITICAL' : risk === 'high' ? 'HIGH RISK' : risk === 'medium' ? 'MEDIUM' : 'LOW';
       const riskBadgeCol = getRiskColor(risk);
       doc.setFillColor(riskBadgeCol[0], riskBadgeCol[1], riskBadgeCol[2]);
       doc.rect(margin + 90, y - 4, 55, 11, 'F');
@@ -3456,6 +3465,7 @@ function updateFrameworkProgressBars() {
       compliant: 0, 
       partial: 0, 
       nonCompliant: 0,
+      criticalRisk: 0,
       highRisk: 0,
       pending: 0
     };
@@ -3474,6 +3484,7 @@ function updateFrameworkProgressBars() {
               else if (latest.compliance === 'partial') stats.partial++;
               else if (latest.compliance === 'no') stats.nonCompliant++;
               
+              if (latest.risk === 'critical') stats.criticalRisk++;
               if (latest.risk === 'high') stats.highRisk++;
             }
           } else {
@@ -3569,7 +3580,7 @@ function updateFrameworkProgressBars() {
             <div class="text-[8px] text-gray-400">❌</div>
           </div>
           <div class="bg-gray-900/50 rounded p-1">
-            <div class="text-orange-400 text-sm font-bold">${stats.highRisk}</div>
+            <div class="text-orange-400 text-sm font-bold">${stats.criticalRisk + stats.highRisk}</div>
             <div class="text-[8px] text-gray-400">🔴</div>
           </div>
         </div>
@@ -3688,7 +3699,7 @@ export_json_btn:'💾 Exportar JSON', import_json_btn:'📂 Importar JSON',
 save_progress_btn:'💾 Guardar', view_saved_btn:'📋 Ver Informes',
 chart_compliance:'Cumplimiento', chart_risk:'Riesgos',
 yes:'Sí', no:'No', partial:'Parcial',
-high:'Alto', medium:'Medio', low:'Bajo',
+critical:'Crítico', high:'Alto', medium:'Medio', low:'Bajo',
 template_library_btn:'📚 Biblioteca',
 template_loading:'Cargando...',
 template_server_err:'Requiere servidor local: python -m http.server 8080',
@@ -3701,7 +3712,8 @@ search_audit_label:'🔍 Buscar Auditoría Guardada',
 search_audit_ph:'Escribe nombre de empresa o ID de auditoría...',
 dashboard_title:'📊 Dashboard Multi-Framework',
 dash_total:'Total Evaluados', dash_compliant:'Cumplidos', partial_label:'Parcial',
-dash_noncompliant:'No Cumplidos', dash_high_risk:'Riesgos Altos',
+dash_noncompliant:'No Cumplidos', dash_critical_risk:'Riesgos Críticos', 
+dash_high_risk:'Riesgos Altos',
 framework_progress_title:'📊 Progreso por Framework',
 summary_controls:'Controles', summary_compliant:'Cumplidos ✅',
 summary_noncompliant:'No cumplidos ❌', summary_high_risk:'Riesgos ALTOS ⚠️',
@@ -3746,7 +3758,7 @@ export_json_btn:'💾 Export JSON', import_json_btn:'📂 Import JSON',
 save_progress_btn:'💾 Save', view_saved_btn:'📋 Reports',
 chart_compliance:'Compliance', chart_risk:'Risks',
 yes:'Yes', no:'No', partial:'Partial',
-high:'High', medium:'Medium', low:'Low',
+critical:'Critical', high:'High', medium:'Medium', low:'Low',
 template_library_btn:'📚 Library',
 template_loading:'Loading...',
 template_server_err:'Requires local server: python -m http.server 8080',
@@ -3759,10 +3771,10 @@ search_audit_label:'🔍 Search Saved Audit',
 search_audit_ph:'Type company name or audit ID...',
 dashboard_title:'📊 Multi-Framework Dashboard',
 dash_total:'Total Evaluated', dash_compliant:'Compliant', partial_label:'Partial',
-dash_noncompliant:'Non-Compliant', dash_high_risk:'High Risks',
+dash_noncompliant:'Non-Compliant', dash_critical_risk:'Critical Risks', dash_high_risk:'High Risks',
 framework_progress_title:'📊 Framework Progress',
 summary_controls:'Controls', summary_compliant:'Compliant ✅',
-summary_noncompliant:'Non-Compliant ❌', summary_high_risk:'HIGH Risks ⚠️',
+summary_noncompliant:'Non-Compliant ❌', summary_high_risk:'CRITICAL/HIGH Risks ⚠️',
 chart_compliance_title:'🎯 Compliance', chart_risk_title:'⚠️ Risks',
 chart_eval_title:'📈 Evaluations',
 template_search_ph:'🔍 Search controls...', template_select_all:'Select All',
@@ -3794,7 +3806,7 @@ export_json_btn:'💾 Exporter JSON', import_json_btn:'📂 Importer JSON',
 save_progress_btn:'💾 Sauvegarder', view_saved_btn:'📋 Rapports',
 chart_compliance:'Conformité', chart_risk:'Risques',
 yes:'Oui', no:'Non', partial:'Partiel',
-high:'Élevé', medium:'Moyen', low:'Faible',
+critical:'Critique', high:'Élevé', medium:'Moyen', low:'Faible',
 template_library_btn:'📚 Bibliothèque',
 template_loading:'Chargement...',
 template_server_err:'Nécessite un serveur local: python -m http.server 8080',
@@ -3807,7 +3819,7 @@ search_audit_label:'🔍 Rechercher Audit Sauvegardé',
 search_audit_ph:'Nom d\'entreprise ou ID d\'audit...',
 dashboard_title:'📊 Tableau de Bord Multi-Framework',
 dash_total:'Total Évalués', dash_compliant:'Conformes', partial_label:'Partiel',
-dash_noncompliant:'Non Conformes', dash_high_risk:'Risques Élevés',
+dash_noncompliant:'Non Conformes', dash_critical_risk:'Risques Critiques', dash_high_risk:'Risques Élevés',
 framework_progress_title:'📊 Progression par Framework',
 summary_controls:'Contrôles', summary_compliant:'Conformes ✅',
 summary_noncompliant:'Non conformes ❌', summary_high_risk:'Risques ÉLEVÉS ⚠️',
@@ -3845,7 +3857,7 @@ export_json_btn:'💾 JSON exportieren', import_json_btn:'📂 JSON importieren'
 save_progress_btn:'💾 Speichern', view_saved_btn:'📋 Berichte',
 chart_compliance:'Konformität', chart_risk:'Risiken',
 yes:'Ja', no:'Nein', partial:'Teilweise',
-high:'Hoch', medium:'Mittel', low:'Niedrig',
+critical:'Kritisch', high:'Hoch', medium:'Mittel', low:'Niedrig',
 template_library_btn:'📚 Bibliothek',
 template_loading:'Laden...',
 template_server_err:'Lokaler Server erforderlich: python -m http.server 8080',
@@ -3858,7 +3870,7 @@ search_audit_label:'🔍 Gespeicherte Prüfung suchen',
 search_audit_ph:'Unternehmensname oder Audit-ID eingeben...',
 dashboard_title:'📊 Multi-Framework Dashboard',
 dash_total:'Gesamt Bewertet', dash_compliant:'Konform', partial_label:'Teilweise',
-dash_noncompliant:'Nicht Konform', dash_high_risk:'Hohe Risiken',
+dash_noncompliant:'Nicht Konform', dash_critical_risk:'Kritische Risiken', dash_high_risk:'Hohe Risiken',
 framework_progress_title:'📊 Framework Fortschritt',
 summary_controls:'Kontrollen', summary_compliant:'Konform ✅',
 summary_noncompliant:'Nicht konform ❌', summary_high_risk:'HOHE Risiken ⚠️',
@@ -3896,7 +3908,7 @@ export_json_btn:'💾 Exportar JSON', import_json_btn:'📂 Importar JSON',
 save_progress_btn:'💾 Salvar', view_saved_btn:'📋 Relatórios',
 chart_compliance:'Conformidade', chart_risk:'Riscos',
 yes:'Sim', no:'Não', partial:'Parcial',
-high:'Alto', medium:'Médio', low:'Baixo',
+critical:'Crítico', high:'Alto', medium:'Médio', low:'Baixo',
 template_library_btn:'📚 Biblioteca',
 template_loading:'Carregando...',
 template_server_err:'Requer servidor local: python -m http.server 8080',
@@ -3909,7 +3921,7 @@ search_audit_label:'🔍 Pesquisar Auditoria Salva',
 search_audit_ph:'Digite o nome da empresa ou ID da auditoria...',
 dashboard_title:'📊 Dashboard Multi-Framework',
 dash_total:'Total Avaliados', dash_compliant:'Conformes', partial_label:'Parcial',
-dash_noncompliant:'Não Conformes', dash_high_risk:'Riscos Altos',
+dash_noncompliant:'Não Conformes', dash_critical_risk:'Riscos Críticos', dash_high_risk:'Riscos Altos',
 framework_progress_title:'📊 Progresso por Framework',
 summary_controls:'Controles', summary_compliant:'Conformes ✅',
 summary_noncompliant:'Não conformes ❌', summary_high_risk:'Riscos ALTOS ⚠️',
@@ -3947,7 +3959,7 @@ export_json_btn:'💾 تصدير JSON', import_json_btn:'📂 استيراد JSO
 save_progress_btn:'💾 حفظ', view_saved_btn:'📋 التقارير',
 chart_compliance:'الامتثال', chart_risk:'المخاطر',
 yes:'نعم', no:'لا', partial:'جزئي',
-high:'عالي', medium:'متوسط', low:'منخفض',
+critical:'حرج', high:'عالي', medium:'متوسط', low:'منخفض',
 template_library_btn:'📚 المكتبة',
 template_loading:'جارٍ التحميل...',
 template_server_err:'يتطلب خادماً محلياً: python -m http.server 8080',
@@ -3960,7 +3972,7 @@ search_audit_label:'🔍 البحث في التدقيقات المحفوظة',
 search_audit_ph:'اكتب اسم الشركة أو رقم التدقيق...',
 dashboard_title:'📊 لوحة التحكم متعددة الأطر',
 dash_total:'إجمالي المقيّمين', dash_compliant:'ممتثل', partial_label:'جزئي',
-dash_noncompliant:'غير ممتثل', dash_high_risk:'مخاطر عالية',
+dash_noncompliant:'غير ممتثل', dash_critical_risk:'مخاطر حرجة', dash_high_risk:'مخاطر عالية',
 framework_progress_title:'📊 تقدم الإطار',
 summary_controls:'الضوابط', summary_compliant:'ممتثل ✅',
 summary_noncompliant:'غير ممتثل ❌', summary_high_risk:'مخاطر عالية ⚠️',
@@ -3998,7 +4010,7 @@ export_json_btn:'💾 导出 JSON', import_json_btn:'📂 导入 JSON',
 save_progress_btn:'💾 保存', view_saved_btn:'📋 报告',
 chart_compliance:'合规性', chart_risk:'风险',
 yes:'是', no:'否', partial:'部分',
-high:'高', medium:'中', low:'低',
+critical:'严重', high:'高', medium:'中', low:'低',
 template_library_btn:'📚 模板库',
 template_loading:'加载中...',
 template_server_err:'需要本地服务器: python -m http.server 8080',
@@ -4011,7 +4023,7 @@ search_audit_label:'🔍 搜索已保存的审计',
 search_audit_ph:'输入公司名称或审计ID...',
 dashboard_title:'📊 多框架仪表板',
 dash_total:'总评估数', dash_compliant:'合规', partial_label:'部分',
-dash_noncompliant:'不合规', dash_high_risk:'高风险',
+dash_noncompliant:'不合规', dash_critical_risk:'严重风险', dash_high_risk:'高风险',
 framework_progress_title:'📊 框架进度',
 summary_controls:'控制项', summary_compliant:'合规 ✅',
 summary_noncompliant:'不合规 ❌', summary_high_risk:'高风险 ⚠️',
@@ -4053,7 +4065,7 @@ el.placeholder = T(el.getAttribute('data-i18n-placeholder'));
 });
 
 if (chartComp) { chartComp.data.labels = [T('yes'), T('no'), T('partial')]; chartComp.update(); }
-if (chartRisk) { chartRisk.data.labels = [T('high'), T('medium'), T('low')]; chartRisk.update(); }
+if (chartRisk) { chartRisk.data.labels = [T('critical'), T('high'), T('medium'), T('low')]; chartRisk.update(); }
 if (document.getElementById('vertical-tabs')?.children.length) renderVerticalTabs();
 
 const ls = document.getElementById('lang-select');

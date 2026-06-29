@@ -23,14 +23,15 @@
 
 AuditSym is actively developed and architected by:
 
-### 👩‍💻 Project Creator & Lead
-**Susana Alba Santamaria**  
+#### 👩‍💻 Project Creator  · Product Vision 
+**Susana Alba Santamaria** 
+UX · Audit Methodology  · Product Vision 
 Cybersecurity & Audit-Focused Builder  
  sualba.dev@gmail.com
 
-###  Main Collaborator & Architecture Contributor
+####  Main Collaborator & Architecture Contributor
 **Vandan Panwala**  
-Cybersecurity & Software Engineering Contributor  
+Cybersecurity . Software Engineering & Contributor Core Engineering 
 🔗 [GitHub Profile](https://github.com/PanwalaVandan)
 
 ---

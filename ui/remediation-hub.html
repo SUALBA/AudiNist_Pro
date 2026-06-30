@@ -236,8 +236,7 @@
             <!-- ─── TOP BAR ─── -->
             <section class="flex flex-wrap items-start justify-between gap-4 mb-6">
                 <div>
-                    <h2 class="text-2xl font-bold" data-i18n="workspace_title">Findings &amp; Remediation Workspace</h2>
-                    <p class="text-gray-400 text-sm max-w-2xl" data-i18n="workspace_desc">
+        <h2 id="workspace-title" class="text-2xl font-bold" data-i18n="workspace_title">  Findings &amp; Remediation Workspace  </h2>                    <p class="text-gray-400 text-sm max-w-2xl" data-i18n="workspace_desc">
                         This workspace is automatically generated from the published audit. Manage findings, risk acceptance,
                         owners, deadlines, evidence, and closure. All data is saved locally in your browser.
                     </p>
@@ -1851,8 +1850,10 @@
 
             // ── Contadores ──
             const closedCount = findings.filter(f => f.status === 'Closed').length;
-            document.querySelector('.title h2').textContent =
-                `${t('workspace_title')} (${closedCount}/${findings.length} ${t('all_findings')})`;
+            const titleEl = document.getElementById('workspace-title');
+            if (titleEl) {
+                titleEl.textContent = `${t('workspace_title')} (${closedCount}/${findings.length} ${t('all_findings')})`;
+            }
             document.getElementById('findings-count').textContent = `(${findings.length} ${t('all_findings')})`;
             document.getElementById('matrix-total').textContent = `${findings.length} ${t('total_findings')}`;
 
